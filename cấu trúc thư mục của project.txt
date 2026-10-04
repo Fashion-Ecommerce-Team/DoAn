@@ -1,0 +1,283 @@
+fashion-ecommerce/
+│
+├── backend/
+│   │
+│   ├── pom.xml
+│   ├── README.md
+│   ├── .env
+│   │
+│   └── src/
+│       ├── main/
+│       │   │           └── ecommerce/
+│       │   │               │
+│       │   │               ├── FashionEcommerceApplication.java
+│       │   │               │
+│       │   │               ├── config/
+│       │   │               │   ├── SecurityConfig.java
+│       │   │               │   ├── CorsConfig.java
+│       │   │               │   ├── JwtConfig.java
+│       │   │               │   ├── JpaConfig.java
+│       │   │               │   ├── WebConfig.java
+│       │   │               │   ├── CloudinaryConfig.java         # [Bổ sung] Cấu hình upload ảnh Cloudinary
+│       │   │               │   └── RestClientConfig.java         # [Bổ sung] Kết nối gọi sang AI Service (FastAPI)
+│       │   │               │
+│       │   │               ├── security/
+│       │   │               │   ├── JwtAuthenticationFilter.java
+│       │   │               │   ├── JwtTokenProvider.java
+│       │   │               │   ├── CustomUserDetailsService.java
+│       │   │               │   └── CustomUserDetails.java
+│       │   │               │
+│       │   │               ├── common/
+│       │   │               │   ├── exception/
+│       │   │               │   │   ├── GlobalExceptionHandler.java
+│       │   │               │   │   ├── ResourceNotFoundException.java
+│       │   │               │   │   ├── BadRequestException.java
+│       │   │               │   │   ├── DuplicateResourceException.java  # [Bổ sung] Xử lý trùng email, slug, SKU
+│       │   │               │   │   └── UnauthorizedException.java       # [Bổ sung] Xử lý lỗi xác thực
+│       │   │               │   │
+│       │   │               │   ├── response/
+│       │   │               │   │   ├── ApiResponse.java
+│       │   │               │   │   └── PageResponse.java
+│       │   │               │   │
+│       │   │               │   ├── constant/
+│       │   │               │   │   ├── OrderStatus.java
+│       │   │               │   │   ├── PaymentStatus.java
+│       │   │               │   │   ├── UserRole.java
+│       │   │               │   │   ├── EntityStatus.java         # [Bổ sung] ACTIVE, INACTIVE, DELETED...
+│       │   │               │   │   ├── AuthProvider.java         # [Bổ sung] LOCAL, GOOGLE
+│       │   │               │   │   ├── Gender.java               # [Bổ sung] Giới tính sản phẩm
+│       │   │               │   │   ├── SentimentLabel.java       # [Bổ sung] POSITIVE, NEGATIVE, NEUTRAL
+│       │   │               │   │   └── NotificationType.java     # [Bổ sung] Loại thông báo
+│       │   │               │   │
+│       │   │               │   └── util/
+│       │   │               │       ├── DateUtils.java
+│       │   │               │       └── SecurityUtils.java
+│       │   │               │
+│       │   │               ├── auth/                             # [Bổ sung] Xác thực, Đăng ký, Đăng nhập, OTP
+│       │   │               │   ├── controller/
+│       │   │               │   │   └── AuthController.java
+│       │   │               │   ├── service/
+│       │   │               │   │   └── AuthService.java
+│       │   │               │   └── dto/
+│       │   │               │       ├── LoginRequest.java
+│       │   │               │       ├── RegisterRequest.java
+│       │   │               │       ├── ForgotPasswordRequest.java
+│       │   │               │       ├── ResetPasswordRequest.java
+│       │   │               │       └── AuthResponse.java
+│       │   │               │
+│       │   │               ├── user/                             # Thông tin cá nhân & Profile
+│       │   │               │   ├── controller/
+│       │   │               │   ├── service/
+│       │   │               │   ├── repository/
+│       │   │               │   ├── entity/
+│       │   │               │   └── dto/
+│       │   │               │
+│       │   │               ├── address/                          # Sổ địa chỉ người dùng
+│       │   │               │   ├── controller/
+│       │   │               │   ├── service/
+│       │   │               │   ├── repository/
+│       │   │               │   ├── entity/
+│       │   │               │   └── dto/
+│       │   │               │
+│       │   │               ├── category/                         # Danh mục sản phẩm
+│       │   │               │   ├── controller/
+│       │   │               │   ├── service/
+│       │   │               │   ├── repository/
+│       │   │               │   ├── entity/
+│       │   │               │   └── dto/
+│       │   │               │
+│       │   │               ├── brand/                            # Thương hiệu sản phẩm
+│       │   │               │   ├── controller/
+│       │   │               │   ├── service/
+│       │   │               │   ├── repository/
+│       │   │               │   ├── entity/
+│       │   │               │   └── dto/
+│       │   │               │
+│       │   │               ├── product/                          # Sản phẩm, Biến thể & Hình ảnh
+│       │   │               │   ├── controller/
+│       │   │               │   ├── service/
+│       │   │               │   ├── repository/
+│       │   │               │   ├── entity/
+│       │   │               │   └── dto/
+│       │   │               │
+│       │   │               ├── inventory/                        # [Bổ sung] Quản lý tồn kho (inventory_logs)
+│       │   │               │   ├── controller/
+│       │   │               │   │   └── InventoryController.java
+│       │   │               │   ├── service/
+│       │   │               │   │   └── InventoryService.java
+│       │   │               │   ├── repository/
+│       │   │               │   │   └── InventoryLogRepository.java
+│       │   │               │   ├── entity/
+│       │   │               │   │   └── InventoryLog.java
+│       │   │               │   └── dto/
+│       │   │               │       ├── InventoryAdjustmentRequest.java
+│       │   │               │       └── InventoryLogResponse.java
+│       │   │               │
+│       │   │               ├── wishlist/                         # Danh sách yêu thích
+│       │   │               │   ├── controller/
+│       │   │               │   ├── service/
+│       │   │               │   ├── repository/
+│       │   │               │   ├── entity/
+│       │   │               │   └── dto/
+│       │   │               │
+│       │   │               ├── review/                           # Đánh giá & Phân tích cảm xúc
+│       │   │               │   ├── controller/
+│       │   │               │   ├── service/
+│       │   │               │   ├── repository/
+│       │   │               │   ├── entity/
+│       │   │               │   └── dto/
+│       │   │               │
+│       │   │               ├── notification/                     # Thông báo hệ thống & khách hàng
+│       │   │               │   ├── controller/
+│       │   │               │   ├── service/
+│       │   │               │   ├── repository/
+│       │   │               │   ├── entity/
+│       │   │               │   └── dto/
+│       │   │               │
+│       │   │               ├── upload/                           # [Bổ sung] Service upload ảnh đại diện, sản phẩm
+│       │   │               │   ├── controller/
+│       │   │               │   │   └── UploadController.java
+│       │   │               │   ├── service/
+│       │   │               │   │   └── UploadService.java
+│       │   │               │   └── dto/
+│       │   │               │       └── UploadResponse.java
+│       │   │               │
+│       │   │               ├── email/                            # [Bổ sung] Service gửi mail OTP & thông báo
+│       │   │               │   └── service/
+│       │   │               │       └── EmailService.java
+│       │   │               │
+│       │   │               ├── cart/
+│       │   │               │   ├── controller/
+│       │   │               │   ├── service/
+│       │   │               │   ├── repository/
+│       │   │               │   ├── entity/
+│       │   │               │   └── dto/
+│       │   │               │
+│       │   │               ├── coupon/
+│       │   │               │   ├── controller/
+│       │   │               │   ├── service/
+│       │   │               │   ├── repository/
+│       │   │               │   ├── entity/
+│       │   │               │   └── dto/
+│       │   │               │
+│       │   │               ├── order/
+│       │   │               │   ├── controller/
+│       │   │               │   ├── service/
+│       │   │               │   ├── repository/
+│       │   │               │   ├── entity/
+│       │   │               │   └── dto/
+│       │   │               │
+│       │   │               ├── payment/
+│       │   │               │   ├── controller/
+│       │   │               │   ├── service/
+│       │   │               │   ├── repository/
+│       │   │               │   ├── entity/
+│       │   │               │   └── dto/
+│       │   │               │
+│       │   │               ├── chat/
+│       │   │               │   ├── controller/
+│       │   │               │   │   ├── ChatController.java
+│       │   │               │   │   └── ChatSessionController.java
+│       │   │               │   │
+│       │   │               │   ├── service/
+│       │   │               │   │   ├── ChatService.java
+│       │   │               │   │   ├── ChatSessionService.java
+│       │   │               │   │   └── ChatMessageService.java
+│       │   │               │   │
+│       │   │               │   ├── repository/
+│       │   │               │   │   ├── ChatSessionRepository.java
+│       │   │               │   │   └── ChatMessageRepository.java
+│       │   │               │   │
+│       │   │               │   ├── entity/
+│       │   │               │   │   ├── ChatSession.java
+│       │   │               │   │   └── ChatMessage.java
+│       │   │               │   │
+│       │   │               │   └── dto/
+│       │   │               │       ├── ChatRequest.java
+│       │   │               │       ├── ChatResponse.java
+│       │   │               │       └── ChatMessageResponse.java
+│       │   │               │
+│       │   │               ├── ai/                               # Tích hợp FashionCLIP & Vector Search
+│       │   │               │   ├── controller/
+│       │   │               │   │   ├── AiSearchController.java
+│       │   │               │   │   └── RagController.java
+│       │   │               │   │
+│       │   │               │   ├── service/
+│       │   │               │   │   ├── FashionClipService.java
+│       │   │               │   │   ├── VectorSearchService.java
+│       │   │               │   │   ├── RagService.java
+│       │   │               │   │   └── EmbeddingService.java
+│       │   │               │   │
+│       │   │               │   ├── client/
+│       │   │               │   │   ├── AiServiceClient.java
+│       │   │               │   │   ├── QdrantClient.java
+│       │   │               │   │   └── LlmClient.java
+│       │   │               │   │
+│       │   │               │   └── dto/
+│       │   │               │       ├── TextSearchRequest.java
+│       │   │               │       ├── ImageSearchRequest.java
+│       │   │               │       ├── MultimodalSearchRequest.java
+│       │   │               │       ├── RagRequest.java
+│       │   │               │       └── RagResponse.java
+│       │   │               │
+│       │   │               └── admin/
+│       │   │                   ├── controller/
+│       │   │                   ├── service/
+│       │   │                   ├── repository/
+│       │   │                   ├── entity/
+│       │   │                   └── dto/
+│       │   │
+│       │   └── resources/
+│       │       ├── application.yml
+│       │       ├── application-dev.yml
+│       │       ├── application-prod.yml
+│       │       │
+│       │       └── db/
+│       │           └── migration/
+│       │               ├── V1__create_roles_and_users.sql        # [Cập nhật] Bảng roles & users
+│       │               ├── V2__create_categories_and_brands.sql  # [Cập nhật] Bảng categories & brands
+│       │               ├── V3__create_products_and_variants.sql  # [Cập nhật] Bảng products, variants, images
+│       │               ├── V4__create_wishlists_and_reviews.sql  # [Cập nhật] Bảng wishlists & reviews
+│       │               ├── V5__create_orders.sql
+│       │               ├── V6__create_notifications.sql          # [Bổ sung] Bảng notifications
+│       │               ├── V7__create_inventory_logs.sql         # [Bổ sung] Bảng inventory_logs
+│       │               └── V8__create_chatbot.sql
+│       │
+│       └── test/
+│           └── java/
+│               └── com/
+│                   └── fashion/
+│                       └── ecommerce/
+│
+├── ai-service/
+│   ├── requirements.txt
+│   ├── .env
+│   ├── app/
+│   │   ├── main.py
+│   │   ├── api/
+│   │   ├── services/
+│   │   │   ├── fashionclip/
+│   │   │   ├── rag/
+│   │   │   └── llm/
+│   │   ├── vector/
+│   │   │   └── qdrant_client.py
+│   │   └── models/
+│   └── tests/
+│
+├── frontend/
+│   ├── package.json
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── services/
+│   │   ├── hooks/
+│   │   ├── store/
+│   │   └── utils/
+│   └── public/
+│
+├── database/
+│   ├── schema.sql
+│   ├── seed.sql
+│   └── README.md
+│
+└── README.md
