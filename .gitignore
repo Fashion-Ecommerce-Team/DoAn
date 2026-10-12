@@ -24,3 +24,7 @@ Thumbs.db
 backend/api_specs.md
 # Ignore local environment variables
 backend/.env
+
+# Postman
+.postman/
+postman/
