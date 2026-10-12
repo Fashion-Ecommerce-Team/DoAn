@@ -28,3 +28,6 @@ backend/.env
 # Postman
 .postman/
 postman/
+
+# SQL
+*.sql

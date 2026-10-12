@@ -3,6 +3,7 @@ package ecommerce.config;
 import ecommerce.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -44,6 +45,11 @@ public class SecurityConfig {
                                 "/api/test",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**")
+                        .permitAll()
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/v1/products/**",
+                                "/api/v1/categories/**",
+                                "/api/v1/brands/**")
                         .permitAll()
                         .anyRequest().authenticated())
 
