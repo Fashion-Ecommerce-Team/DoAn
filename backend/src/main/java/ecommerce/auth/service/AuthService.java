@@ -3,6 +3,7 @@ package ecommerce.auth.service;
 import ecommerce.auth.dto.AuthResponse;
 import ecommerce.auth.dto.LoginRequest;
 import ecommerce.auth.dto.RegisterRequest;
+import ecommerce.common.exception.BadRequestException;
 import ecommerce.security.CustomUserDetails;
 import ecommerce.security.JwtTokenProvider;
 import ecommerce.user.entity.Role;
@@ -43,7 +44,11 @@ public class AuthService {
     @Transactional
     public String register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email đã được sử dụng, vui lòng chọn email khác!");
+            throw new BadRequestException("Email đã được sử dụng, vui lòng chọn email khác!");
+        }
+
+        if (request.getPhone() != null && userRepository.existsByPhone(request.getPhone())) {
+            throw new BadRequestException("Số điện thoại đã được sử dụng, vui lòng chọn số khác!");
         }
         Role customerRole = roleRepository.findByName("ROLE_CUSTOMER")
                 .orElseGet(() -> {
@@ -53,7 +58,7 @@ public class AuthService {
 
         User user = new User(
                 request.getEmail(),
-                passwordEncoder.encode(request.getPassword()), // Băm mật khẩu an toàn
+                passwordEncoder.encode(request.getPassword()),
                 request.getFullName(),
                 request.getPhone(),
                 customerRole);
@@ -74,9 +79,6 @@ public class AuthService {
 
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         User user = userDetails.getUser();
-
-        user.setLastLoginAt(LocalDateTime.now());
-        userRepository.save(user);
 
         String roleName = (user.getRole() != null) ? user.getRole().getName() : "ROLE_CUSTOMER";
 

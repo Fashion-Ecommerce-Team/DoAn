@@ -38,10 +38,10 @@ public class User {
     private String status = "ACTIVE";
 
     @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createAt;
+    private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
-    private LocalDateTime updateAt;
+    private LocalDateTime updatedAt;
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
@@ -158,20 +158,36 @@ public class User {
     public void setLastLoginAt(LocalDateTime lastLoginAt) {
     }
 
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
     public LocalDateTime getCreateAt() {
-        return createAt;
+        return createdAt;
     }
 
     public void setCreateAt(LocalDateTime createAt) {
-        this.createAt = createAt;
+        this.createdAt = createAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public LocalDateTime getUpdateAt() {
-        return updateAt;
+        return updatedAt;
     }
 
     public void setUpdateAt(LocalDateTime updateAt) {
-        this.updateAt = updateAt;
+        this.updatedAt = updateAt;
     }
 
     public LocalDateTime getDeletedAt() {
@@ -185,8 +201,8 @@ public class User {
     @PrePersist
     protected void onCreate() {
         LocalDateTime now = LocalDateTime.now();
-        this.createAt = now;
-        this.updateAt = now;
+        this.createdAt = now;
+        this.updatedAt = now;
         if (this.status == null) {
             this.status = "ACTIVE";
         }
@@ -197,6 +213,6 @@ public class User {
 
     @PreUpdate
     protected void onUpdate() {
-        this.updateAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 }

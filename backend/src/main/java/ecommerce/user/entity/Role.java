@@ -14,6 +14,7 @@ public class Role {
     @Column(nullable = false, unique = true, length = 50)
     private String name;
 
+    @Column(name = "description", columnDefinition = "VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci")
     private String description;
 
     @Column(nullable = false, length = 50)
