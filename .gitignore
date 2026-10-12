@@ -28,6 +28,13 @@ backend/.env
 # Postman
 .postman/
 postman/
+*.postman_collection.json
 
 # SQL
 *.sql
+
+# Documents
+*.docx
+
+# Root pom (backend has its own pom.xml)
+/pom.xml
