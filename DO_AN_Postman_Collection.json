@@ -1,0 +1,1921 @@
+{
+    "info": {
+        "_postman_id": "d0e91148-73b8-4c91-9e53-73db39031d25",
+        "name": "E-Commerce Fashion API (Admin)",
+        "description": "Bộ sưu tập các API dành cho hệ thống quản trị E-Commerce Fashion.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "1. Dashboard (Thống Kê)",
+            "item": [
+                {
+                    "name": "1.1 Tổng quan (Stats)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/dashboard/stats",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "dashboard",
+                                "stats"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "1.2 Top 10 đơn hàng gần đây",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/dashboard/recent-orders",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "dashboard",
+                                "recent-orders"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "1.3 Top 5 sản phẩm bán chạy",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/dashboard/top-selling",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "dashboard",
+                                "top-selling"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "1.4 Biểu đồ doanh thu",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/dashboard/revenue-chart?period=7days",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "dashboard",
+                                "revenue-chart"
+                            ],
+                            "query": [
+                                {
+                                    "key": "period",
+                                    "value": "7days",
+                                    "description": "Khoảng thời gian thống kê: 7days, 1month, 1year"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "2. Products (Sản Phẩm)",
+            "item": [
+                {
+                    "name": "2.1 Lấy danh sách sản phẩm (Có phân trang)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/products?page=0&size=10&keyword=ao&categoryId=1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "products"
+                            ],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "0"
+                                },
+                                {
+                                    "key": "size",
+                                    "value": "10"
+                                },
+                                {
+                                    "key": "keyword",
+                                    "value": "ao"
+                                },
+                                {
+                                    "key": "categoryId",
+                                    "value": "1"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "2.2 Lấy chi tiết 1 sản phẩm",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/products/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "products",
+                                "1"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "2.3 Tạo mới 1 sản phẩm",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Áo Thun Nam Basic Cotton\",\n  \"categoryId\": 1,\n  \"brandId\": 1,\n  \"description\": \"<p>Áo thun nam chất liệu 100% cotton thoáng mát, thấm hút mồ hôi tốt.</p>\",\n  \"shortDescription\": \"Áo thun phong cách basic năng động\",\n  \"basePrice\": 250000,\n  \"discountPrice\": 199000,\n  \"gender\": \"MALE\",\n  \"tags\": \"ao thun, cotton, nam, basic\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/products",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "products"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "2.4 Cập nhật sản phẩm",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Áo Thun Nam Basic Cotton (Đã cập nhật)\",\n  \"categoryId\": 1,\n  \"brandId\": 1,\n  \"description\": \"<p>Áo thun nam chất liệu 100% cotton cao cấp, co giãn 4 chiều.</p>\",\n  \"shortDescription\": \"Áo thun phong cách basic năng động cao cấp\",\n  \"basePrice\": 280000,\n  \"discountPrice\": 220000,\n  \"gender\": \"MALE\",\n  \"tags\": \"ao thun, cotton, nam, basic, updated\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/products/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "products",
+                                "1"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "2.5 Thay đổi trạng thái (Ẩn/Hiện)",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/products/1/toggle-status",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "products",
+                                "1",
+                                "toggle-status"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "2.6 Xóa sản phẩm",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/products/30",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "products",
+                                "30"
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "3. Product Variants (Biến Thể)",
+            "item": [
+                {
+                    "name": "3.1 Thêm biến thể cho sản phẩm",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"size\": \"XXL\",\n  \"color\": \"Tím\",\n  \"sku\": \"SKU-POSTMAN-XXL-TIM\",\n  \"priceAdjustment\": 20000,\n  \"stockQuantity\": 50\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/products/1/variants",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "products",
+                                "1",
+                                "variants"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "3.2 Cập nhật biến thể",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"size\": \"M\",\n  \"color\": \"Đỏ Đậm\",\n  \"sku\": \"SKU-POSTMAN-M-DO\",\n  \"priceAdjustment\": 0,\n  \"stockQuantity\": 120\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/products/variants/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "products",
+                                "variants",
+                                "1"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "3.3 Tắt/Bật trạng thái biến thể",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/products/variants/1/status",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "products",
+                                "variants",
+                                "1",
+                                "status"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "3.4 Xóa biến thể",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/products/variants/60",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "products",
+                                "variants",
+                                "60"
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "4. Upload (Tải file)",
+            "item": [
+                {
+                    "name": "4.1 Upload ảnh lên Cloudinary",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "file",
+                                    "type": "file",
+                                    "src": []
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/upload/image",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "upload",
+                                "image"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "4.2 Upload nhiều ảnh cùng lúc",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "files",
+                                    "type": "file",
+                                    "src": []
+                                },
+                                {
+                                    "key": "files",
+                                    "type": "file",
+                                    "src": []
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/upload/images",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "upload",
+                                "images"
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "5. Product Images (Hình Ảnh)",
+            "item": [
+                {
+                    "name": "5.1 Thêm ảnh cho sản phẩm",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"imageUrl\": \"https://res.cloudinary.com/demo/image/upload/sample1.jpg\",\n  \"cloudinaryPublicId\": \"fashion/products/sample1\",\n  \"displayOrder\": 1\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/products/1/images",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "products",
+                                "1",
+                                "images"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "5.2 Cập nhật ảnh",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"imageUrl\": \"https://res.cloudinary.com/demo/image/upload/sample1_updated.jpg\",\n  \"cloudinaryPublicId\": \"fashion/products/sample1_updated\",\n  \"displayOrder\": 2\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/products/images/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "products",
+                                "images",
+                                "1"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "5.3 Đặt làm ảnh đại diện",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/products/images/1/primary",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "products",
+                                "images",
+                                "1",
+                                "primary"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "5.4 Xóa ảnh",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/products/images/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "products",
+                                "images",
+                                "1"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "5.5 Thêm nhiều ảnh cùng lúc (Batch)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "[\n  {\n    \"imageUrl\": \"https://res.cloudinary.com/demo/image/upload/sample1.jpg\",\n    \"cloudinaryPublicId\": \"fashion/products/sample1\",\n    \"displayOrder\": 1\n  },\n  {\n    \"imageUrl\": \"https://res.cloudinary.com/demo/image/upload/sample2.jpg\",\n    \"cloudinaryPublicId\": \"fashion/products/sample2\",\n    \"displayOrder\": 2\n  }\n]"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/products/1/images/batch",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "products",
+                                "1",
+                                "images",
+                                "batch"
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "6. Categories (Danh mục)",
+            "item": [
+                {
+                    "name": "6.1 Lấy danh sách Danh mục (Category)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/categories?page=0&size=10",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "categories"
+                            ],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "0",
+                                    "description": "Số trang (bắt đầu từ 0)"
+                                },
+                                {
+                                    "key": "size",
+                                    "value": "10",
+                                    "description": "Số lượng mỗi trang"
+                                },
+                                {
+                                    "key": "search",
+                                    "value": "Áo",
+                                    "disabled": true,
+                                    "description": "Tìm kiếm theo tên danh mục"
+                                },
+                                {
+                                    "key": "status",
+                                    "value": "ACTIVE",
+                                    "disabled": true,
+                                    "description": "Lọc theo trạng thái (ACTIVE, INACTIVE)"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "6.2 Chi tiết Danh mục (Category)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/categories/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "categories",
+                                "1"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "6.3 Tạo Danh mục (Category)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/categories",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "categories"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Áo Nam\",\n  \"parentId\": null,\n  \"slug\": \"ao-nam\",\n  \"description\": \"Thời trang áo nam phong cách hiện đại\",\n  \"icon\": \"fa-shirt\",\n  \"status\": \"ACTIVE\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "6.4 Cập nhật Danh mục (Category)",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/categories/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "categories",
+                                "1"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Áo Nam Cao Cấp\",\n  \"parentId\": null,\n  \"slug\": \"ao-nam-cao-cap\",\n  \"description\": \"Thời trang áo nam chất lượng cao\",\n  \"icon\": \"fa-shirt\",\n  \"status\": \"ACTIVE\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "6.5 Đổi trạng thái Danh mục (Category)",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/categories/1/status",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "categories",
+                                "1",
+                                "status"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"status\": \"ACTIVE\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "6.6 Xóa Danh mục (Category)",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/categories/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "categories",
+                                "1"
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "7. Brands (Thương hiệu)",
+            "item": [
+                {
+                    "name": "7.1 Lấy danh sách Thương hiệu (Brand)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/brands?page=0&size=10",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "brands"
+                            ],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "0",
+                                    "description": "Số trang (bắt đầu từ 0)"
+                                },
+                                {
+                                    "key": "size",
+                                    "value": "10",
+                                    "description": "Số lượng mỗi trang"
+                                },
+                                {
+                                    "key": "search",
+                                    "value": "Nike",
+                                    "disabled": true,
+                                    "description": "Tìm kiếm theo tên thương hiệu"
+                                },
+                                {
+                                    "key": "status",
+                                    "value": "ACTIVE",
+                                    "disabled": true,
+                                    "description": "Lọc theo trạng thái (ACTIVE, INACTIVE)"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "7.2 Chi tiết Thương hiệu (Brand)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/brands/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "brands",
+                                "1"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "7.3 Tạo Thương hiệu (Brand)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/brands",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "brands"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Nike\",\n  \"description\": \"Thương hiệu thời trang thể thao toàn cầu\",\n  \"logoUrl\": \"https://res.cloudinary.com/demo/image/upload/nike-logo.png\",\n  \"status\": \"ACTIVE\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "7.4 Cập nhật Thương hiệu (Brand)",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/brands/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "brands",
+                                "1"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Nike Official\",\n  \"description\": \"Thương hiệu chính hãng thể thao cao cấp\",\n  \"logoUrl\": \"https://res.cloudinary.com/demo/image/upload/nike-logo-updated.png\",\n  \"status\": \"ACTIVE\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "7.5 Đổi trạng thái Thương hiệu (Brand)",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/brands/1/status",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "brands",
+                                "1",
+                                "status"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"status\": \"ACTIVE\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "7.6 Xóa Thương hiệu (Brand)",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/brands/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "brands",
+                                "1"
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "8. Coupons (Mã giảm giá)",
+            "item": [
+                {
+                    "name": "8.1 Lấy danh sách Mã giảm giá (Coupon)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/coupons?page=0&size=10",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "coupons"
+                            ],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "0",
+                                    "description": "Số trang (bắt đầu từ 0)"
+                                },
+                                {
+                                    "key": "size",
+                                    "value": "10",
+                                    "description": "Số lượng mỗi trang"
+                                },
+                                {
+                                    "key": "search",
+                                    "value": "SALE",
+                                    "disabled": true,
+                                    "description": "Tìm kiếm theo mã giảm giá hoặc mô tả"
+                                },
+                                {
+                                    "key": "status",
+                                    "value": "ACTIVE",
+                                    "disabled": true,
+                                    "description": "Lọc theo trạng thái (ACTIVE, INACTIVE, EXPIRED)"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "8.2 Chi tiết Mã giảm giá (Coupon)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/coupons/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "coupons",
+                                "1"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "8.3 Tạo Mã giảm giá (Coupon)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/coupons",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "coupons"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"code\": \"SALE20\",\n  \"description\": \"Giảm 20% cho đơn hàng thời trang\",\n  \"discountType\": \"PERCENT\",\n  \"discountValue\": 20.0,\n  \"minOrderValue\": 100000.0,\n  \"maxDiscountAmount\": 50000.0,\n  \"usageLimit\": 100,\n  \"startDate\": \"2026-01-01T00:00:00\",\n  \"endDate\": \"2026-12-31T23:59:59\",\n  \"status\": \"ACTIVE\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "8.4 Cập nhật Mã giảm giá (Coupon)",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/coupons/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "coupons",
+                                "1"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"code\": \"SALE20\",\n  \"description\": \"Giảm 20% đơn từ 150k\",\n  \"discountType\": \"PERCENT\",\n  \"discountValue\": 20.0,\n  \"minOrderValue\": 150000.0,\n  \"maxDiscountAmount\": 60000.0,\n  \"usageLimit\": 150,\n  \"startDate\": \"2026-01-01T00:00:00\",\n  \"endDate\": \"2026-12-31T23:59:59\",\n  \"status\": \"ACTIVE\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "8.5 Đổi trạng thái Mã giảm giá (Coupon)",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/coupons/1/status",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "coupons",
+                                "1",
+                                "status"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"status\": \"ACTIVE\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "8.6 Xóa Mã giảm giá (Coupon)",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/coupons/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "coupons",
+                                "1"
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "9. Banners (Banner Quảng Cáo)",
+            "item": [
+                {
+                    "name": "9.1 Lấy danh sách Banner",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/banners?page=0&size=10",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "banners"
+                            ],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "0",
+                                    "description": "Số trang (bắt đầu từ 0)"
+                                },
+                                {
+                                    "key": "size",
+                                    "value": "10",
+                                    "description": "Số lượng mỗi trang"
+                                },
+                                {
+                                    "key": "search",
+                                    "value": "Tết",
+                                    "disabled": true,
+                                    "description": "Tìm kiếm theo tiêu đề banner"
+                                },
+                                {
+                                    "key": "status",
+                                    "value": "ACTIVE",
+                                    "disabled": true,
+                                    "description": "Lọc theo trạng thái (ACTIVE, INACTIVE)"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "9.2 Chi tiết Banner",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/banners/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "banners",
+                                "1"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "9.3 Tạo Banner",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/banners",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "banners"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"title\": \"Khuyến mãi Tết 2026\",\n  \"subtitle\": \"Giảm giá lên đến 50% toàn bộ sản phẩm\",\n  \"imageUrl\": \"https://res.cloudinary.com/demo/image/upload/banner-tet.jpg\",\n  \"cloudinaryPublicId\": \"fashion/banners/banner-tet\",\n  \"linkUrl\": \"/collections/tet-sale\",\n  \"position\": \"HOME_TOP\",\n  \"displayOrder\": 1,\n  \"status\": \"ACTIVE\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "9.4 Cập nhật Banner",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/banners/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "banners",
+                                "1"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"title\": \"Khuyến mãi Tết 2026 (Cập nhật)\",\n  \"subtitle\": \"Flash Sale đón Tết\",\n  \"imageUrl\": \"https://res.cloudinary.com/demo/image/upload/banner-tet-v2.jpg\",\n  \"cloudinaryPublicId\": \"fashion/banners/banner-tet-v2\",\n  \"linkUrl\": \"/collections/tet-flash-sale\",\n  \"position\": \"HOME_TOP\",\n  \"displayOrder\": 1,\n  \"status\": \"ACTIVE\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "9.5 Đổi trạng thái Banner",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/banners/1/status",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "banners",
+                                "1",
+                                "status"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"status\": \"ACTIVE\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "9.6 Xóa Banner",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/banners/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "banners",
+                                "1"
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "10. Reviews (Đánh giá)",
+            "item": [
+                {
+                    "name": "10.1 Lấy danh sách Đánh giá (Review)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/reviews?page=0&size=10",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "reviews"
+                            ],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "0",
+                                    "description": "Số trang (bắt đầu từ 0)"
+                                },
+                                {
+                                    "key": "size",
+                                    "value": "10",
+                                    "description": "Số lượng mỗi trang"
+                                },
+                                {
+                                    "key": "search",
+                                    "value": "tuyệt vời",
+                                    "disabled": true,
+                                    "description": "Tìm kiếm theo bình luận"
+                                },
+                                {
+                                    "key": "status",
+                                    "value": "APPROVED",
+                                    "disabled": true,
+                                    "description": "Lọc theo trạng thái (PENDING, APPROVED, REJECTED)"
+                                },
+                                {
+                                    "key": "productId",
+                                    "value": "1",
+                                    "disabled": true,
+                                    "description": "Lọc theo ID sản phẩm"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "10.2 Chi tiết Đánh giá (Review)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/reviews/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "reviews",
+                                "1"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "10.3 Đổi trạng thái Đánh giá (Review)",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/reviews/1/status",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "reviews",
+                                "1",
+                                "status"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"status\": \"APPROVED\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "10.4 Xóa Đánh giá (Review)",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/reviews/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "reviews",
+                                "1"
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "11. Orders (Đơn hàng)",
+            "item": [
+                {
+                    "name": "11.1 Lấy danh sách Đơn hàng",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/orders?page=0&size=10",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "orders"
+                            ],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "0",
+                                    "description": "Số trang (bắt đầu từ 0)"
+                                },
+                                {
+                                    "key": "size",
+                                    "value": "10",
+                                    "description": "Số lượng mỗi trang"
+                                },
+                                {
+                                    "key": "search",
+                                    "value": "0987654321",
+                                    "disabled": true,
+                                    "description": "Tìm kiếm theo tên người nhận hoặc số điện thoại"
+                                },
+                                {
+                                    "key": "status",
+                                    "value": "PENDING",
+                                    "disabled": true,
+                                    "description": "Lọc theo trạng thái (PENDING, CONFIRMED, SHIPPING, COMPLETED, CANCELLED)"
+                                },
+                                {
+                                    "key": "userId",
+                                    "value": "1",
+                                    "disabled": true,
+                                    "description": "Lọc theo ID người dùng đặt hàng"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "11.2 Chi tiết Đơn hàng",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/orders/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "orders",
+                                "1"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "11.3 Lấy lịch sử trạng thái Đơn hàng",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/orders/1/history",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "orders",
+                                "1",
+                                "history"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "11.4 Cập nhật trạng thái Đơn hàng",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/orders/1/status",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "orders",
+                                "1",
+                                "status"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"status\": \"CONFIRMED\",\n  \"note\": \"Đơn hàng đã được xác nhận và đang chuẩn bị đóng gói\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "11.5 Hủy đơn hàng",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/orders/1/cancel",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "orders",
+                                "1",
+                                "cancel"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"reason\": \"Hủy theo yêu cầu của khách hàng qua điện thoại\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "12. Users (Người dùng)",
+            "item": [
+                {
+                    "name": "12.1 Lấy danh sách User",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/users?page=0&size=10",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "users"
+                            ],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "0",
+                                    "description": "Số trang (bắt đầu từ 0)"
+                                },
+                                {
+                                    "key": "size",
+                                    "value": "10",
+                                    "description": "Số lượng mỗi trang"
+                                },
+                                {
+                                    "key": "search",
+                                    "value": "nguyen",
+                                    "disabled": true,
+                                    "description": "Tìm kiếm theo tên hoặc email"
+                                },
+                                {
+                                    "key": "status",
+                                    "value": "ACTIVE",
+                                    "disabled": true,
+                                    "description": "Lọc theo trạng thái (ACTIVE, INACTIVE, BLOCKED)"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "12.2 Chi tiết User",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/users/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "users",
+                                "1"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "12.3 Cập nhật thông tin User",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/users/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "users",
+                                "1"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"fullName\": \"Nguyễn Văn A\",\n  \"email\": \"nguyenvana@example.com\",\n  \"phone\": \"0987654321\",\n  \"status\": \"ACTIVE\",\n  \"roleId\": 2\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "description": "Cập nhật thông tin cá nhân và vai trò của người dùng theo ID."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "12.4 Cập nhật trạng thái User",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/users/1/status",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "users",
+                                "1",
+                                "status"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"status\": \"INACTIVE\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "12.5 Cập nhật quyền (Role) cho User",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/users/1/role",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "users",
+                                "1",
+                                "role"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"roleId\": 1\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "12.6 Lấy danh sách địa chỉ của User",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/users/1/addresses",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "users",
+                                "1",
+                                "addresses"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "12.7 Xóa User",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/users/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "users",
+                                "1"
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "13. Roles (Vai trò)",
+            "item": [
+                {
+                    "name": "13.1 Lấy danh sách Role",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/roles",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "roles"
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        }
+    ],
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "http://localhost:8080/api/v1/admin",
+            "type": "string",
+            "description": "Base URL cho các API Admin (mặc định localhost:8080/api/v1/admin)"
+        }
+    ]
+}

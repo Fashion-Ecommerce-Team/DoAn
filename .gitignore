@@ -1,6 +1,7 @@
 # Frontend
 frontend/node_modules/
 frontend/dist/
+frontend/src
 
 
 # Backend
@@ -22,5 +23,8 @@ Thumbs.db
 
 # Documentation
 backend/api_specs.md
+API_DOCUMENTATION.md
+DO_AN_PROJECT_DOCUMENTATION.md
+sample_data.sql
 # Ignore local environment variables
 backend/.env
