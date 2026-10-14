@@ -146,15 +146,11 @@ public class CheckoutService {
             BigDecimal quantity =
                     BigDecimal.valueOf(cartItem.getQuantity());
 
-            BigDecimal lineTotal = unitPrice.multiply(quantity);
 
-            BigDecimal lineDiscount = originalUnitPrice
-                    .subtract(unitPrice)
-                    .multiply(quantity);
+BigDecimal lineTotal = unitPrice.multiply(quantity);
 
-            subtotal = subtotal.add(originalUnitPrice.multiply(quantity));
-            productDiscount = productDiscount.add(lineDiscount);
-            itemCount += cartItem.getQuantity();
+subtotal = subtotal.add(unitPrice.multiply(quantity));
+itemCount += cartItem.getQuantity();
 
             items.add(new CheckoutPreviewResponse.Item(
                     cartItem.getId(),

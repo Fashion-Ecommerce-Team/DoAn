@@ -168,10 +168,7 @@ public class OrderService {
 
             BigDecimal qty = BigDecimal.valueOf(quantity);
 
-            subtotal = subtotal.add(originalPrice.multiply(qty));
-            productDiscount = productDiscount.add(
-                    originalPrice.subtract(unitPrice).multiply(qty));
-            itemCount += quantity;
+  subtotal = subtotal.add(unitPrice.multiply(qty));
 
             variant.put("quantity", quantity);
             variant.put("unit_price", unitPrice);
@@ -233,8 +230,7 @@ public class OrderService {
                         "Mã giảm giá đã hết lượt sử dụng");
             }
 
-            BigDecimal eligibleAmount =
-                    subtotal.subtract(productDiscount);
+BigDecimal eligibleAmount = subtotal;
 
             BigDecimal minOrderValue =
                     coupon.get("min_order_value") == null
@@ -287,13 +283,11 @@ public class OrderService {
         }
 
         // 5. Tính tiền cuối cùng.
-        BigDecimal discountAmount =
-                productDiscount.add(couponDiscount);
+BigDecimal discountAmount = couponDiscount;
 
-        BigDecimal totalAmount = subtotal
-                .subtract(discountAmount)
-                .add(shippingFee);
-
+BigDecimal totalAmount = subtotal
+        .subtract(discountAmount)
+        .add(shippingFee);
         if (totalAmount.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException(
                     "Tổng tiền đơn hàng không hợp lệ");
