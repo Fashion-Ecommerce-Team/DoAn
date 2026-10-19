@@ -331,7 +331,7 @@ CREATE TABLE banners (
     image_url VARCHAR(500) NOT NULL,
     cloudinary_public_id VARCHAR(255),
     link_url VARCHAR(255),
-    position VARCHAR(50) DEFAULT 'HERO_BANNER',
+    position VARCHAR(50) DEFAULT 'HERO',
     display_order INT DEFAULT 1,
     status VARCHAR(50) DEFAULT 'ACTIVE',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

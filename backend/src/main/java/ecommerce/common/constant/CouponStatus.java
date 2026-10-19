@@ -4,21 +4,11 @@ import lombok.Getter;
 
 @Getter
 public enum CouponStatus {
-    ACTIVE("Hoạt động"),
-    INACTIVE("Tạm dừng"),
-    EXPIRED("Hết hạn"),
-    DELETED("Đã xóa");
+    ACTIVE,
+    INACTIVE,
+    EXPIRED,
+    DELETED;
 
-    private final String description;
-
-    CouponStatus(String description) {
-        this.description = description;
-    }
-
-    /**
-     * Kiểm tra xem mã có thể đổi trạng thái thủ công hay không
-     * Mã đã xóa hoặc đã hết hạn không cho phép đổi trạng thái
-     */
     public boolean canChangeStatus() {
         return this == ACTIVE || this == INACTIVE;
     }

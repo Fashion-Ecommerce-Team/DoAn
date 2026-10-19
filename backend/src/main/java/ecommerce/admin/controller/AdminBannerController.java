@@ -5,6 +5,7 @@ import ecommerce.admin.dto.response.BannerResponse;
 import ecommerce.admin.service.BannerService;
 import ecommerce.common.response.ApiResponse;
 import ecommerce.common.response.PageResponse;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -21,9 +22,10 @@ public class AdminBannerController {
     public ApiResponse<PageResponse<BannerResponse>> getList(
             @RequestParam(required = false) String search,
             @RequestParam(required = false) String status,
+            @RequestParam(required = false) String position,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        return ApiResponse.success("Lấy danh sách banner thành công", service.getList(search, status, page, size));
+        return ApiResponse.success("Lấy danh sách banner thành công", service.getList(search, status, position, page, size));
     }
 
     @GetMapping("/{id}")
@@ -32,13 +34,13 @@ public class AdminBannerController {
     }
 
     @PostMapping
-    public ApiResponse<BannerResponse> create(@RequestBody BannerRequest request) {
+    public ApiResponse<BannerResponse> create(@Valid @RequestBody BannerRequest request) {
         return ApiResponse.success("Tạo banner thành công", service.create(request));
     }
 
     @PutMapping("/{id}")
     public ApiResponse<BannerResponse> update(@PathVariable Long id,
-            @RequestBody BannerRequest request) {
+            @Valid @RequestBody BannerRequest request) {
         return ApiResponse.success("Cập nhật banner thành công", service.update(id, request));
     }
 
