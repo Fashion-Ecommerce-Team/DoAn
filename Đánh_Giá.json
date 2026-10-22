@@ -1,0 +1,347 @@
+{
+	"info": {
+		"_postman_id": "b7c3d2e1-9f8a-4b5c-a1d2-3e4f5a6b7c8d",
+		"name": "API Đánh giá sản phẩm (Reviews)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "product_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "review_id",
+			"value": "1",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "1. API lấy danh sách đánh giá sản phẩm (Công khai)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code là 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Trả về cấu trúc tổng hợp đánh giá và phân trang chuẩn\", function () {",
+							"    var res = pm.response.json();",
+							"    pm.expect(res.success).to.eql(true);",
+							"    pm.expect(res.data).to.have.property(\"averageRating\");",
+							"    pm.expect(res.data).to.have.property(\"totalReviews\");",
+							"    pm.expect(res.data).to.have.property(\"ratingCounts\");",
+							"    pm.expect(res.data).to.have.property(\"reviews\");",
+							"    pm.expect(res.data.reviews).to.have.property(\"content\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/v1/products/{{product_id}}/reviews?page=0&size=10",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"products",
+						"{{product_id}}",
+						"reviews"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "size",
+							"value": "10"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2. API lọc đánh giá theo số sao (Ví dụ: 5 sao)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code là 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Lọc đánh giá thành công\", function () {",
+							"    var res = pm.response.json();",
+							"    pm.expect(res.success).to.eql(true);",
+							"    pm.expect(res.data.reviews).to.have.property(\"content\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/v1/products/{{product_id}}/reviews?rating=5&page=0&size=10",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"products",
+						"{{product_id}}",
+						"reviews"
+					],
+					"query": [
+						{
+							"key": "rating",
+							"value": "5"
+						},
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "size",
+							"value": "10"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "3. API đăng nhập lấy token khách hàng",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code là 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"var res = pm.response.json();",
+							"if (res.data && res.data.accessToken) {",
+							"    pm.collectionVariables.set(\"token\", res.data.accessToken);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"customer@gmail.com\",\n  \"password\": \"123456\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/v1/auth/login",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4. API tạo đánh giá sản phẩm mới (Cần Token)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code là 201 Created\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"pm.test(\"Tạo đánh giá thành công và trả về thông tin review\", function () {",
+							"    var res = pm.response.json();",
+							"    pm.expect(res.success).to.eql(true);",
+							"    pm.expect(res.data).to.have.property(\"id\");",
+							"    pm.expect(res.data.rating).to.eql(5);",
+							"    pm.expect(res.data).to.have.property(\"sentimentLabel\");",
+							"    pm.collectionVariables.set(\"review_id\", res.data.id);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"productId\": 1,\n  \"rating\": 5,\n  \"comment\": \"Sản phẩm chất vải rất mát, co giãn tốt, màu sắc y hình, giao hàng siêu nhanh!\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/v1/reviews",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"reviews"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "5. API lấy danh sách đánh giá của tôi (Cần Token)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code là 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Lấy danh sách đánh giá cá nhân thành công\", function () {",
+							"    var res = pm.response.json();",
+							"    pm.expect(res.success).to.eql(true);",
+							"    pm.expect(res.data).to.have.property(\"content\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/v1/reviews/my-reviews?page=0&size=10",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"reviews",
+						"my-reviews"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "size",
+							"value": "10"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "6. API xóa đánh giá sản phẩm (Cần Token)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code là 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Xóa đánh giá thành công\", function () {",
+							"    var res = pm.response.json();",
+							"    pm.expect(res.success).to.eql(true);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/v1/reviews/{{review_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"reviews",
+						"{{review_id}}"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
