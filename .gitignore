@@ -35,6 +35,10 @@ backend/.env
 .postman/
 postman/
 *.postman_collection.json
+/*.json
+
+# SQL
+*.sql
 
 # Documents
 *.docx
