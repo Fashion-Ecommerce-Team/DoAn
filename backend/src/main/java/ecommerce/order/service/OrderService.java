@@ -168,10 +168,7 @@ public class OrderService {
 
             BigDecimal qty = BigDecimal.valueOf(quantity);
 
-            subtotal = subtotal.add(originalPrice.multiply(qty));
-            productDiscount = productDiscount.add(
-                    originalPrice.subtract(unitPrice).multiply(qty));
-            itemCount += quantity;
+  subtotal = subtotal.add(unitPrice.multiply(qty));
 
             variant.put("quantity", quantity);
             variant.put("unit_price", unitPrice);
@@ -233,8 +230,7 @@ public class OrderService {
                         "Mã giảm giá đã hết lượt sử dụng");
             }
 
-            BigDecimal eligibleAmount =
-                    subtotal.subtract(productDiscount);
+BigDecimal eligibleAmount = subtotal;
 
             BigDecimal minOrderValue =
                     coupon.get("min_order_value") == null
@@ -287,13 +283,11 @@ public class OrderService {
         }
 
         // 5. Tính tiền cuối cùng.
-        BigDecimal discountAmount =
-                productDiscount.add(couponDiscount);
+BigDecimal discountAmount = couponDiscount;
 
-        BigDecimal totalAmount = subtotal
-                .subtract(discountAmount)
-                .add(shippingFee);
-
+BigDecimal totalAmount = subtotal
+        .subtract(discountAmount)
+        .add(shippingFee);
         if (totalAmount.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException(
                     "Tổng tiền đơn hàng không hợp lệ");
@@ -427,6 +421,245 @@ jdbcTemplate.update(connection -> {
                 discountAmount,
                 totalAmount);
     }
+
+@Transactional(readOnly = true)
+public List<Map<String, Object>> getOrders(Long userId) {
+    String sql = """
+        SELECT
+            id AS orderId,
+            status,
+            subtotal_amount AS subtotalAmount,
+            shipping_fee AS shippingFee,
+            discount_amount AS discountAmount,
+            total_amount AS totalAmount,
+            created_at AS createdAt
+        FROM orders
+        WHERE user_id = ?
+        ORDER BY created_at DESC, id DESC
+        """;
+
+    return jdbcTemplate.queryForList(sql, userId);
+}
+
+@Transactional(readOnly = true)
+public Map<String, Object> getOrderDetail(Long userId, Long orderId) {
+    String sql = """
+        SELECT
+            id AS orderId,
+            status,
+            receiver_name AS receiverName,
+            receiver_phone AS receiverPhone,
+            shipping_address AS shippingAddress,
+            order_note AS orderNote,
+            subtotal_amount AS subtotalAmount,
+            shipping_fee AS shippingFee,
+            discount_amount AS discountAmount,
+            total_amount AS totalAmount,
+            coupon_id AS couponId,
+            cancelled_at AS cancelledAt,
+            cancel_reason AS cancelReason,
+            created_at AS createdAt,
+            updated_at AS updatedAt
+        FROM orders
+        WHERE id = ? AND user_id = ?
+        """;
+
+    List<Map<String, Object>> results =
+            jdbcTemplate.queryForList(sql, orderId, userId);
+
+    if (results.isEmpty()) {
+        throw new IllegalArgumentException(
+                "Đơn hàng không tồn tại hoặc bạn không có quyền xem");
+    }
+
+    return results.get(0);
+}
+
+@Transactional(readOnly = true)
+public List<Map<String, Object>> getOrderItems(Long userId, Long orderId) {
+    String checkSql = """
+        SELECT id
+        FROM orders
+        WHERE id = ? AND user_id = ?
+        """;
+
+    List<Map<String, Object>> orders =
+            jdbcTemplate.queryForList(checkSql, orderId, userId);
+
+    if (orders.isEmpty()) {
+        throw new IllegalArgumentException(
+                "Đơn hàng không tồn tại hoặc bạn không có quyền xem");
+    }
+
+    String sql = """
+        SELECT
+            id AS orderDetailId,
+            product_variant_id AS productVariantId,
+            product_name AS productName,
+            product_image_url AS productImageUrl,
+            variant_size AS size,
+            variant_color AS color,
+            quantity,
+            unit_price AS unitPrice,
+            quantity * unit_price AS lineTotal
+        FROM order_details
+        WHERE order_id = ?
+        ORDER BY id ASC
+        """;
+
+    return jdbcTemplate.queryForList(sql, orderId);
+}
+
+@Transactional(readOnly = true)
+public Map<String, Object> getOrderStatus(Long userId, Long orderId) {
+    String sql = """
+        SELECT
+            id AS orderId,
+            status,
+            created_at AS createdAt,
+            updated_at AS updatedAt,
+            cancelled_at AS cancelledAt,
+            cancel_reason AS cancelReason
+        FROM orders
+        WHERE id = ? AND user_id = ?
+        """;
+
+    List<Map<String, Object>> results =
+            jdbcTemplate.queryForList(sql, orderId, userId);
+
+    if (results.isEmpty()) {
+        throw new IllegalArgumentException(
+                "Đơn hàng không tồn tại hoặc bạn không có quyền xem"
+        );
+    }
+
+    return results.get(0);
+}
+
+@Transactional(readOnly = true)
+public List<Map<String, Object>> getOrderStatusHistory(
+        Long userId, Long orderId) {
+
+    String checkSql = """
+        SELECT id
+        FROM orders
+        WHERE id = ? AND user_id = ?
+        """;
+
+    List<Map<String, Object>> orders =
+            jdbcTemplate.queryForList(checkSql, orderId, userId);
+
+    if (orders.isEmpty()) {
+        throw new IllegalArgumentException(
+                "Đơn hàng không tồn tại hoặc bạn không có quyền xem"
+        );
+    }
+
+    String sql = """
+        SELECT
+            id AS historyId,
+            old_status AS oldStatus,
+            new_status AS newStatus,
+            changed_by AS changedBy,
+            note,
+            created_at AS createdAt
+        FROM order_status_history
+        WHERE order_id = ?
+        ORDER BY created_at ASC, id ASC
+        """;
+
+    return jdbcTemplate.queryForList(sql, orderId);
+}
+
+@Transactional
+public Map<String, Object> cancelOrder(
+        Long userId, Long orderId, String reason) {
+
+    // 1. Kiểm tra đơn hàng và khóa bản ghi để tránh hủy đồng thời
+    String checkSql = """
+        SELECT id, status
+        FROM orders
+        WHERE id = ? AND user_id = ?
+        FOR UPDATE
+        """;
+
+    List<Map<String, Object>> orders =
+            jdbcTemplate.queryForList(checkSql, orderId, userId);
+
+    if (orders.isEmpty()) {
+        throw new IllegalArgumentException(
+                "Đơn hàng không tồn tại hoặc bạn không có quyền hủy"
+        );
+    }
+
+    Map<String, Object> order = orders.get(0);
+    String oldStatus = String.valueOf(order.get("status"));
+
+    // 2. Chỉ cho phép hủy đơn đang chờ xác nhận
+    if (!"PENDING".equalsIgnoreCase(oldStatus)) {
+        throw new IllegalStateException(
+                "Chỉ có thể hủy đơn hàng đang chờ xác nhận"
+        );
+    }
+
+    // 3. Lấy danh sách sản phẩm cần hoàn kho
+    String itemsSql = """
+        SELECT product_variant_id, quantity
+        FROM order_details
+        WHERE order_id = ?
+        """;
+
+    List<Map<String, Object>> items =
+            jdbcTemplate.queryForList(itemsSql, orderId);
+
+    // 4. Hoàn lại số lượng tồn kho
+    for (Map<String, Object> item : items) {
+        Long variantId =
+                ((Number) item.get("product_variant_id")).longValue();
+
+        int quantity =
+                ((Number) item.get("quantity")).intValue();
+
+        int updated = jdbcTemplate.update("""
+            UPDATE product_variants
+            SET stock_quantity = stock_quantity + ?
+            WHERE id = ?
+            """, quantity, variantId);
+
+        if (updated != 1) {
+            throw new IllegalStateException(
+                    "Không thể hoàn kho cho sản phẩm biến thể ID "
+                            + variantId
+            );
+        }
+    }
+
+    // 5. Cập nhật đơn hàng thành CANCELLED
+    jdbcTemplate.update("""
+        UPDATE orders
+        SET status = 'CANCELLED',
+            cancelled_at = CURRENT_TIMESTAMP,
+            cancel_reason = ?,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = ? AND user_id = ?
+        """, reason, orderId, userId);
+
+    // 6. Ghi lại lịch sử trạng thái
+    jdbcTemplate.update("""
+        INSERT INTO order_status_history
+            (order_id, old_status, new_status, changed_by, note)
+        VALUES (?, ?, 'CANCELLED', ?, ?)
+        """, orderId, oldStatus, userId, reason);
+
+    // 7. Trả về kết quả
+    Map<String, Object> result = new java.util.LinkedHashMap<>();
+    result.put("orderId", orderId);
+    result.put("oldStatus", oldStatus);
+    result.put("status", "CANCELLED");
+    result.put("cancelReason", reason);
+
+    return result;
+}
 
     private LocalDateTime toLocalDateTime(Object value) {
         if (value instanceof Timestamp timestamp) {
