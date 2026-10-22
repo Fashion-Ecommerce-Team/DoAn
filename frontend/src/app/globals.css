@@ -1,0 +1,107 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #000000;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* =========================================
+   Custom Scrollbar (Thanh cuộn nền xám dễ nhìn)
+   ========================================= */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #94a3b8 #f1f5f9;
+}
+
+/* WebKit (Chrome, Edge, Safari, Opera) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9; /* Nền xám nhạt */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #94a3b8; /* Con trượt xám rõ ràng */
+  border-radius: 4px;
+  border: 2px solid #f1f5f9; /* Khoảng cách padding nhẹ quanh thumb */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #64748b; /* Xám đậm hơn khi di chuột */
+}
+
+/* Dark elements scrollbar (như Sidebar admin) */
+aside::-webkit-scrollbar-track,
+.dark ::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+
+aside::-webkit-scrollbar-thumb,
+.dark ::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-color: #0f172a;
+}
+
+aside::-webkit-scrollbar-thumb:hover,
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+aside {
+  scrollbar-color: #475569 #0f172a;
+}
+
+/* =========================================
+   Thanh cuộn chỗ bộ lọc (Select Dropdown Filter)
+   Nền rãnh xám nổi bật, con trượt xám đậm dễ nhìn
+   ========================================= */
+[data-radix-select-content],
+[data-radix-select-viewport] {
+  scrollbar-width: thin !important;
+  scrollbar-color: #64748b #e2e8f0 !important;
+}
+
+[data-radix-select-content]::-webkit-scrollbar,
+[data-radix-select-viewport]::-webkit-scrollbar {
+  width: 8px !important;
+  height: 8px !important;
+  background-color: #e2e8f0 !important;
+}
+
+[data-radix-select-content]::-webkit-scrollbar-track,
+[data-radix-select-viewport]::-webkit-scrollbar-track {
+  background: #e2e8f0 !important; /* Nền xám rõ rệt cho rãnh cuộn của bộ lọc */
+  border-radius: 4px;
+}
+
+[data-radix-select-content]::-webkit-scrollbar-thumb,
+[data-radix-select-viewport]::-webkit-scrollbar-thumb {
+  background: #64748b !important; /* Con trượt xám đậm hơn giúp nhận diện ngay */
+  border-radius: 4px;
+  border: 1.5px solid #e2e8f0 !important;
+}
+
+[data-radix-select-content]::-webkit-scrollbar-thumb:hover,
+[data-radix-select-viewport]::-webkit-scrollbar-thumb:hover {
+  background: #475569 !important;
+}
+
+

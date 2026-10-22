@@ -1,0 +1,320 @@
+### ========================================
+### FILE TEST API TỰ ĐỘNG
+### Chạy file này bằng extension "REST Client" trên VS Code 
+### Hoặc "HTTP Client" trên IntelliJ IDEA
+### ========================================
+
+@baseUrl = http://localhost:8080/api/v1/admin
+
+### ========================================
+### 1. DASHBOARD - THỐNG KÊ
+### ========================================
+
+### 1.1 Lấy thống kê tổng quan (Doanh thu, số đơn, số sản phẩm)
+GET {{baseUrl}}/dashboard/stats
+Accept: application/json
+
+###
+
+### 1.2 Lấy danh sách 10 đơn hàng gần đây
+GET {{baseUrl}}/dashboard/recent-orders
+Accept: application/json
+
+###
+
+### 1.3 Lấy danh sách top 5 sản phẩm bán chạy nhất
+GET {{baseUrl}}/dashboard/top-selling
+Accept: application/json
+
+###
+
+
+### ========================================
+### 2. QUẢN LÝ SẢN PHẨM (PRODUCTS)
+### ========================================
+
+### 2.1 Lấy danh sách sản phẩm (Phân trang)
+GET {{baseUrl}}/products?page=0&size=10
+Accept: application/json
+
+###
+
+### 2.2 Lấy chi tiết một sản phẩm theo ID
+GET {{baseUrl}}/products/1
+Accept: application/json
+
+###
+
+### 2.3 Tạo mới một sản phẩm
+POST {{baseUrl}}/products
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Sản phẩm test API mới",
+  "categoryId": 1,
+  "brandId": 1,
+  "description": "Mô tả chi tiết sản phẩm test API",
+  "shortDescription": "Mô tả ngắn gọn",
+  "basePrice": 1500000,
+  "gender": "UNISEX",
+  "status": "ACTIVE"
+}
+
+###
+
+### 2.4 Cập nhật thông tin sản phẩm
+PUT {{baseUrl}}/products/1
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Sản phẩm số 1 đã cập nhật tên",
+  "categoryId": 2,
+  "brandId": 2,
+  "description": "Đã cập nhật nội dung",
+  "basePrice": 2500000,
+  "gender": "MALE",
+  "status": "ACTIVE"
+}
+
+###
+
+### 2.5 Ẩn/Hiện sản phẩm (Toggle Status)
+PATCH {{baseUrl}}/products/1/toggle-status
+Accept: application/json
+
+###
+
+### 2.6 Xóa một sản phẩm
+DELETE {{baseUrl}}/products/30
+Accept: application/json
+
+###
+
+
+### ========================================
+### 3. QUẢN LÝ BIẾN THỂ (PRODUCT VARIANTS)
+### ========================================
+
+### 3.1 Thêm biến thể cho sản phẩm (ví dụ thêm cho sản phẩm ID = 1)
+POST {{baseUrl}}/products/1/variants
+Content-Type: application/json
+Accept: application/json
+
+{
+  "size": "XXL",
+  "color": "Vàng",
+  "sku": "SKU-TEST-XXL-VANG-123",
+  "priceAdjustment": 50000,
+  "stockQuantity": 100
+}
+
+###
+
+### 3.2 Cập nhật biến thể (ví dụ cập nhật biến thể ID = 1)
+PUT {{baseUrl}}/products/variants/1
+Content-Type: application/json
+Accept: application/json
+
+{
+  "size": "L",
+  "color": "Trắng Đen",
+  "sku": "SKU-1-L-Trắng-1-UPDATED",
+  "priceAdjustment": 15000,
+  "stockQuantity": 80
+}
+
+###
+
+### 3.3 Bật/tắt trạng thái biến thể
+PATCH {{baseUrl}}/products/variants/1/status
+Accept: application/json
+
+###
+
+### 3.4 Xóa một biến thể
+DELETE {{baseUrl}}/products/variants/60
+Accept: application/json
+
+### ========================================
+### 4. QUẢN LÝ ĐƠN HÀNG (ORDERS)
+### ========================================
+
+### 4.1 Lấy danh sách đơn hàng (Phân trang, tìm kiếm, lọc theo trạng thái)
+GET {{baseUrl}}/orders?page=0&size=10&status=ALL
+Accept: application/json
+
+###
+
+### 4.2 Lấy chi tiết đơn hàng theo ID (Bao gồm người nhận, danh sách sản phẩm, thanh toán, lịch sử)
+GET {{baseUrl}}/orders/1
+Accept: application/json
+
+###
+
+### 4.3 Lấy riêng lịch sử thay đổi trạng thái của đơn hàng (order_status_history)
+GET {{baseUrl}}/orders/1/history
+Accept: application/json
+
+###
+
+### 4.4 Cập nhật trạng thái đơn hàng (PENDING, CONFIRMED, SHIPPED, COMPLETED)
+PUT {{baseUrl}}/orders/1/status
+Content-Type: application/json
+Accept: application/json
+
+{
+  "status": "SHIPPED"
+}
+
+###
+
+### 4.5 Hủy đơn hàng (Kèm lý do hủy)
+PUT {{baseUrl}}/orders/1/cancel
+Content-Type: application/json
+Accept: application/json
+
+{
+  "reason": "Hủy theo yêu cầu của khách hàng qua điện thoại"
+}
+
+### ========================================
+### 5. QUẢN LÝ DANH MỤC (CATEGORIES)
+### ========================================
+
+### 5.1 Lấy danh sách danh mục
+GET {{baseUrl}}/categories?page=0&size=10
+Accept: application/json
+
+###
+
+### 5.2 Tạo mới danh mục (Kiểm tra không trùng tên)
+POST {{baseUrl}}/categories
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Áo Sơ Mi Nam Cao Cấp",
+  "parentId": 1,
+  "description": "Danh mục áo sơ mi nam đa cấp",
+  "status": "ACTIVE"
+}
+
+###
+
+### 5.3 Test lỗi trùng tên danh mục (Sẽ trả về HTTP 400)
+POST {{baseUrl}}/categories
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Áo Sơ Mi Nam Cao Cấp"
+}
+
+### ========================================
+### 6. QUẢN LÝ THƯƠNG HIỆU (BRANDS)
+### ========================================
+
+### 6.1 Lấy danh sách thương hiệu
+GET {{baseUrl}}/brands?page=0&size=10
+Accept: application/json
+
+###
+
+### 6.2 Tạo mới thương hiệu (Kiểm tra không trùng tên)
+POST {{baseUrl}}/brands
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Uniqlo Premium",
+  "description": "Thương hiệu thời trang cao cấp",
+  "status": "ACTIVE"
+}
+
+###
+
+### 6.3 Test lỗi trùng tên thương hiệu (Sẽ trả về HTTP 400)
+POST {{baseUrl}}/brands
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Uniqlo Premium"
+}
+
+### ========================================
+### 7. QUẢN LÝ MÃ GIẢM GIÁ (COUPONS)
+### ========================================
+
+### 7.1 Lấy danh sách mã giảm giá
+GET {{baseUrl}}/coupons?page=0&size=10
+Accept: application/json
+
+###
+
+### 7.2 Tạo mã giảm giá mới (Hỗ trợ PERCENT hoặc FIXED)
+POST {{baseUrl}}/coupons
+Content-Type: application/json
+Accept: application/json
+
+{
+  "code": "SUPERVIP2026",
+  "description": "Mã giảm giá đặc biệt cho sự kiện hè 2026",
+  "discountType": "PERCENT",
+  "discountValue": 25.0,
+  "minOrderValue": 300000.0,
+  "maxDiscountAmount": 100000.0,
+  "usageLimit": 200,
+  "startDate": "2026-06-01T00:00:00",
+  "endDate": "2026-12-31T23:59:59",
+  "status": "ACTIVE"
+}
+
+###
+
+### 7.3 Đổi trạng thái mã giảm giá (ACTIVE / INACTIVE)
+PUT {{baseUrl}}/coupons/1/status
+Content-Type: application/json
+Accept: application/json
+
+{
+  "status": "INACTIVE"
+}
+
+### ========================================
+### 8. QUẢN LÝ ĐÁNH GIÁ (REVIEWS)
+### ========================================
+
+### 8.1 Lấy danh sách đánh giá sản phẩm (Có tên khách hàng & tên sản phẩm)
+GET {{baseUrl}}/reviews?page=0&size=10
+Accept: application/json
+
+###
+
+### 8.2 Duyệt hiển thị đánh giá
+PUT {{baseUrl}}/reviews/1/status
+Content-Type: application/json
+Accept: application/json
+
+{
+  "status": "ACTIVE"
+}
+
+###
+
+### 8.3 Ẩn đánh giá
+PUT {{baseUrl}}/reviews/1/status
+Content-Type: application/json
+Accept: application/json
+
+{
+  "status": "HIDDEN"
+}
+
+###
+
+### 8.4 Xóa đánh giá
+DELETE {{baseUrl}}/reviews/1
+Accept: application/json
