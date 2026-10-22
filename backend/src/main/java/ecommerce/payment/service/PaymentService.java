@@ -212,4 +212,135 @@ public class PaymentService {
 
         return getPaymentDetail(userId, paymentId);
     }
+    // API 5: Nhận kết quả thanh toán từ callback
+@Transactional
+public Map<String, Object> handlePaymentCallback(
+        Long paymentId,
+        String transactionId,
+        String paymentStatus) {
+
+    // 1. Kiểm tra dữ liệu đầu vào
+    if (paymentId == null) {
+        throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "paymentId không được để trống");
+    }
+
+    if (transactionId == null || transactionId.isBlank()) {
+        throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "transactionId không được để trống");
+    }
+
+    if (paymentStatus == null || paymentStatus.isBlank()) {
+        throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "paymentStatus không được để trống");
+    }
+
+    String status = paymentStatus.trim().toUpperCase();
+
+    if (!status.equals("PAID") && !status.equals("FAILED")) {
+        throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Trạng thái thanh toán chỉ được là PAID hoặc FAILED");
+    }
+
+    // 2. Khóa bản ghi để hạn chế hai callback cập nhật đồng thời
+    Map<String, Object> payment;
+
+    try {
+        payment = jdbcTemplate.queryForMap(
+                """
+                SELECT id, payment_method, payment_status, transaction_id
+                FROM payments
+                WHERE id = ?
+                FOR UPDATE
+                """,
+                paymentId);
+    } catch (EmptyResultDataAccessException e) {
+        throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Không tìm thấy giao dịch thanh toán");
+    }
+
+    String method = payment.get("payment_method").toString();
+    String currentStatus = payment.get("payment_status").toString();
+
+    // 3. Chỉ xử lý callback cho giao dịch VietQR
+    if (!method.equalsIgnoreCase("VIETQR")) {
+        throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Callback chỉ áp dụng cho giao dịch VIETQR");
+    }
+
+    // 4. Nếu đã thanh toán thành công thì không cho thay đổi kết quả
+    if (currentStatus.equalsIgnoreCase("PAID")) {
+        Object existingTransactionId = payment.get("transaction_id");
+
+        if (status.equals("PAID")
+                && existingTransactionId != null
+                && transactionId.trim().equals(
+                        existingTransactionId.toString())) {
+            // Callback thành công gửi lại cùng giao dịch: xử lý idempotent
+            return jdbcTemplate.queryForMap(
+                    """
+                    SELECT id, order_id, payment_method, amount,
+                           payment_status, transaction_id,
+                           qr_code_url, expired_at, paid_at,
+                           created_at, updated_at
+                    FROM payments
+                    WHERE id = ?
+                    """,
+                    paymentId);
+        }
+
+        throw new ResponseStatusException(
+                HttpStatus.CONFLICT,
+                "Giao dịch đã thanh toán thành công");
+    }
+
+    // 5. Chỉ cập nhật giao dịch đang chờ thanh toán
+    if (!currentStatus.equalsIgnoreCase("PENDING")) {
+        throw new ResponseStatusException(
+                HttpStatus.CONFLICT,
+                "Giao dịch không còn ở trạng thái chờ thanh toán");
+    }
+
+    // 6. Cập nhật kết quả giao dịch
+    int updated = jdbcTemplate.update(
+            """
+            UPDATE payments
+            SET payment_status = ?,
+                transaction_id = ?,
+                paid_at = CASE
+                    WHEN ? = 'PAID' THEN NOW()
+                    ELSE NULL
+                END,
+                updated_at = NOW()
+            WHERE id = ? AND payment_status = 'PENDING'
+            """,
+            status,
+            transactionId.trim(),
+            status,
+            paymentId);
+
+    if (updated != 1) {
+        throw new ResponseStatusException(
+                HttpStatus.CONFLICT,
+                "Không thể cập nhật trạng thái giao dịch");
+    }
+
+    // 7. Trả về thông tin thanh toán sau cập nhật
+    return jdbcTemplate.queryForMap(
+            """
+            SELECT id, order_id, payment_method, amount,
+                   payment_status, transaction_id,
+                   qr_code_url, expired_at, paid_at,
+                   created_at, updated_at
+            FROM payments
+            WHERE id = ?
+            """,
+            paymentId);
+}
 }
