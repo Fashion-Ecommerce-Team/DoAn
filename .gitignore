@@ -29,6 +29,7 @@ backend/.env
 .postman/
 postman/
 *.postman_collection.json
+/*.json
 
 # SQL
 *.sql
@@ -38,3 +39,16 @@ postman/
 
 # Root pom (backend has its own pom.xml)
 /pom.xml
+
+# Scratch & Temporary
+scratch/
+
+# Python & AI Service
+__pycache__/
+*.py[cod]
+*$py.class
+*.npz
+.venv/
+venv/
+ENV/
+

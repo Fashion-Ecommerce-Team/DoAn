@@ -51,6 +51,9 @@ public class SecurityConfig {
                                 "/api/v1/categories/**",
                                 "/api/v1/brands/**")
                         .permitAll()
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/v1/products/search/**")
+                        .permitAll()
                         .anyRequest().authenticated())
 
                 .formLogin(form -> form.disable())

@@ -33,6 +33,9 @@ class ProductControllerTest {
     private ProductService productService;
 
     @MockBean
+    private ecommerce.product.service.FashionClipService fashionClipService;
+
+    @MockBean
     private ecommerce.security.JwtTokenProvider jwtTokenProvider;
 
     @MockBean
@@ -133,4 +136,64 @@ class ProductControllerTest {
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data.slug").value("ao-thun-the-thao-nike"));
     }
+
+    @Test
+    void searchByImage_Returns200WithResults() throws Exception {
+        ProductSummaryResponse item = ProductSummaryResponse.builder()
+                .id(1L)
+                .name("Áo thun thể thao Nike")
+                .similarityScore(0.92)
+                .build();
+
+        PageResponse<ProductSummaryResponse> pageResponse = PageResponse.<ProductSummaryResponse>builder()
+                .content(List.of(item))
+                .pageNo(0)
+                .pageSize(12)
+                .totalElements(1)
+                .totalPages(1)
+                .last(true)
+                .build();
+
+        when(fashionClipService.searchByImage(any(), any(), any(), any())).thenReturn(pageResponse);
+
+        org.springframework.mock.web.MockMultipartFile file = new org.springframework.mock.web.MockMultipartFile(
+                "file", "test.jpg", "image/jpeg", "fake-image-bytes".getBytes()
+        );
+
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart("/api/v1/products/search/image")
+                        .file(file))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.content[0].id").value(1))
+                .andExpect(jsonPath("$.data.content[0].similarityScore").value(0.92));
+    }
+
+    @Test
+    void searchHybrid_Returns200WithResults() throws Exception {
+        ProductSummaryResponse item = ProductSummaryResponse.builder()
+                .id(2L)
+                .name("Quần Jeans Đen")
+                .similarityScore(0.88)
+                .build();
+
+        PageResponse<ProductSummaryResponse> pageResponse = PageResponse.<ProductSummaryResponse>builder()
+                .content(List.of(item))
+                .pageNo(0)
+                .pageSize(12)
+                .totalElements(1)
+                .totalPages(1)
+                .last(true)
+                .build();
+
+        when(fashionClipService.searchHybrid(any(), any(), any(), any(), any(), any())).thenReturn(pageResponse);
+
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/api/v1/products/search/hybrid")
+                        .param("imageUrl", "https://example.com/test.jpg")
+                        .param("keyword", "quan jeans mau den"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.content[0].id").value(2))
+                .andExpect(jsonPath("$.data.content[0].similarityScore").value(0.88));
+    }
 }
+

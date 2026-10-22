@@ -36,11 +36,16 @@ public class ProductSummaryResponse {
     private Integer totalStock;
     private List<String> availableSizes;
     private List<String> availableColors;
+    private Double similarityScore;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
 
     public static ProductSummaryResponse fromEntity(Product product) {
+        return fromEntityWithScore(product, null);
+    }
+
+    public static ProductSummaryResponse fromEntityWithScore(Product product, Double similarityScore) {
         if (product == null) {
             return null;
         }
@@ -95,6 +100,7 @@ public class ProductSummaryResponse {
                 .totalStock(totalStock)
                 .availableSizes(sizes)
                 .availableColors(colors)
+                .similarityScore(similarityScore)
                 .createdAt(product.getCreatedAt())
                 .build();
     }
