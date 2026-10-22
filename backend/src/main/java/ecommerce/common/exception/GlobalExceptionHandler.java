@@ -35,6 +35,12 @@ public class GlobalExceptionHandler {
                 .build();
     }
 
+    @ExceptionHandler({IllegalStateException.class, IllegalArgumentException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiResponse<Object> handleBadRequestExceptions(RuntimeException ex) {
+        return ApiResponse.error(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ApiResponse<Object> handleGlobalException(Exception ex) {
