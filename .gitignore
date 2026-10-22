@@ -30,3 +30,27 @@ DO_AN_Postman_Collection.md
 sample_data.sql
 # Ignore local environment variables
 backend/.env
+
+# Postman
+.postman/
+postman/
+*.postman_collection.json
+
+# Documents
+*.docx
+
+# Root pom (backend has its own pom.xml)
+/pom.xml
+
+# Scratch & Temporary
+scratch/
+
+# Python & AI Service
+__pycache__/
+*.py[cod]
+*$py.class
+*.npz
+.venv/
+venv/
+ENV/
+

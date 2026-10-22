@@ -1,0 +1,686 @@
+{
+	"info": {
+		"_postman_id": "e3a1b2c4-8f9d-4e12-b567-0c1d2e3f4a5b",
+		"name": "API Sản phẩm",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "product_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "product_slug",
+			"value": "ao-thun-nam-nike-dri-fit-form-rong",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "API khám phá sản phẩm",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code là 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Phản hồi ApiResponse chuẩn\", function () {",
+							"    var res = pm.response.json();",
+							"    pm.expect(res.success).to.eql(true);",
+							"    pm.expect(res.data).to.have.property(\"content\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/v1/products?page=0&size=12",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"products"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "size",
+							"value": "12"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API lọc sản phẩm",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code là 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Lọc danh sách thành công\", function () {",
+							"    var res = pm.response.json();",
+							"    pm.expect(res.success).to.eql(true);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/v1/products?categoryId=1&brandId=1&gender=MEN&minPrice=100000&maxPrice=1000000&sortBy=basePrice&sortDir=asc&page=0&size=12",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"products"
+					],
+					"query": [
+						{
+							"key": "categoryId",
+							"value": "1"
+						},
+						{
+							"key": "brandId",
+							"value": "1"
+						},
+						{
+							"key": "gender",
+							"value": "MEN"
+						},
+						{
+							"key": "minPrice",
+							"value": "100000"
+						},
+						{
+							"key": "maxPrice",
+							"value": "1000000"
+						},
+						{
+							"key": "sortBy",
+							"value": "basePrice"
+						},
+						{
+							"key": "sortDir",
+							"value": "asc"
+						},
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "size",
+							"value": "12"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API lọc theo slug",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code là 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Lọc theo slug thành công\", function () {",
+							"    var res = pm.response.json();",
+							"    pm.expect(res.success).to.eql(true);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/v1/products?categorySlug=ao-thun-polo&brandSlug=nike&page=0&size=12",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"products"
+					],
+					"query": [
+						{
+							"key": "categorySlug",
+							"value": "ao-thun-polo"
+						},
+						{
+							"key": "brandSlug",
+							"value": "nike"
+						},
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "size",
+							"value": "12"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API tìm kiếm sản phẩm",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code là 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Tìm kiếm thành công\", function () {",
+							"    var res = pm.response.json();",
+							"    pm.expect(res.success).to.eql(true);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/v1/products/search?keyword=Áo thun&page=0&size=10",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"products",
+						"search"
+					],
+					"query": [
+						{
+							"key": "keyword",
+							"value": "Áo thun"
+						},
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "size",
+							"value": "10"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API tìm kiếm nâng cao",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code là 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Tìm kiếm nâng cao thành công\", function () {",
+							"    var res = pm.response.json();",
+							"    pm.expect(res.success).to.eql(true);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/v1/products/search?keyword=Nike&minPrice=200000&maxPrice=1000000&sortBy=basePrice&sortDir=desc&page=0&size=10",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"products",
+						"search"
+					],
+					"query": [
+						{
+							"key": "keyword",
+							"value": "Nike"
+						},
+						{
+							"key": "minPrice",
+							"value": "200000"
+						},
+						{
+							"key": "maxPrice",
+							"value": "1000000"
+						},
+						{
+							"key": "sortBy",
+							"value": "basePrice"
+						},
+						{
+							"key": "sortDir",
+							"value": "desc"
+						},
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "size",
+							"value": "10"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API chi tiết sản phẩm theo ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code là 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Lấy chi tiết theo ID thành công\", function () {",
+							"    var res = pm.response.json();",
+							"    pm.expect(res.success).to.eql(true);",
+							"    pm.expect(res.data.id).to.eql(1);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/v1/products/{{product_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"products",
+						"{{product_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API chi tiết sản phẩm theo slug",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code là 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Lấy chi tiết theo slug thành công\", function () {",
+							"    var res = pm.response.json();",
+							"    pm.expect(res.success).to.eql(true);",
+							"    pm.expect(res.data.slug).to.eql(\"ao-thun-nam-nike-dri-fit-form-rong\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/v1/products/slug/{{product_slug}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"products",
+						"slug",
+						"{{product_slug}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API danh mục sản phẩm",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code là 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Lấy danh mục thành công\", function () {",
+							"    var res = pm.response.json();",
+							"    pm.expect(res.success).to.eql(true);",
+							"    pm.expect(res.data).to.be.an(\"array\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/v1/categories",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"categories"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API thương hiệu sản phẩm",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code là 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Lấy thương hiệu thành công\", function () {",
+							"    var res = pm.response.json();",
+							"    pm.expect(res.success).to.eql(true);",
+							"    pm.expect(res.data).to.be.an(\"array\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/v1/brands",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"brands"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API đồng bộ sản phẩm vào Fashion-CLIP Index",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code là 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Đồng bộ danh mục vào AI thành công\", function () {",
+							"    var res = pm.response.json();",
+							"    pm.expect(res.success).to.eql(true);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/v1/products/search/sync-ai",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"products",
+						"search",
+						"sync-ai"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API tìm kiếm sản phẩm bằng hình ảnh (Fashion-CLIP Image)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code là 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Tìm kiếm hình ảnh thành công trả về danh sách có điểm tương đồng\", function () {",
+							"    var res = pm.response.json();",
+							"    pm.expect(res.success).to.eql(true);",
+							"    pm.expect(res.data).to.have.property(\"content\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "imageUrl",
+							"value": "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=500",
+							"type": "text"
+						},
+						{
+							"key": "page",
+							"value": "0",
+							"type": "text"
+						},
+						{
+							"key": "size",
+							"value": "12",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/api/v1/products/search/image",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"products",
+						"search",
+						"image"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API tìm kiếm đa phương thức kết hợp ảnh và chữ (Fashion-CLIP Hybrid)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code là 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Tìm kiếm Hybrid thành công\", function () {",
+							"    var res = pm.response.json();",
+							"    pm.expect(res.success).to.eql(true);",
+							"    pm.expect(res.data).to.have.property(\"content\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "imageUrl",
+							"value": "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=500",
+							"type": "text"
+						},
+						{
+							"key": "keyword",
+							"value": "áo thun nam form rộng màu đen",
+							"type": "text"
+						},
+						{
+							"key": "imageWeight",
+							"value": "0.6",
+							"type": "text"
+						},
+						{
+							"key": "page",
+							"value": "0",
+							"type": "text"
+						},
+						{
+							"key": "size",
+							"value": "12",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/api/v1/products/search/hybrid",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"products",
+						"search",
+						"hybrid"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API lấy danh sách đánh giá của sản phẩm",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code là 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Lấy đánh giá thành công có averageRating và ratingCounts\", function () {",
+							"    var res = pm.response.json();",
+							"    pm.expect(res.success).to.eql(true);",
+							"    pm.expect(res.data).to.have.property(\"averageRating\");",
+							"    pm.expect(res.data).to.have.property(\"reviews\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/v1/products/{{product_id}}/reviews?page=0&size=10",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"products",
+						"{{product_id}}",
+						"reviews"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "size",
+							"value": "10"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
