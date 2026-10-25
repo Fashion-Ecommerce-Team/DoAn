@@ -7,7 +7,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-@Entity
+@Entity(name = "AdminCartItem")
 @Table(name = "cart_items")
 @EntityListeners(AuditingEntityListener.class)
 @Getter

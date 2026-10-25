@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-@Repository
+@Repository("customerReviewRepository")
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     Page<Review> findByProductIdAndStatus(Long productId, String status, Pageable pageable);

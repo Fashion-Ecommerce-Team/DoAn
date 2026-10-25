@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
+@Repository("productImageCatalogRepository")
 public interface ProductImageRepository extends JpaRepository<ProductImage, Long> {
 
     List<ProductImage> findByProductIdOrderByIdAsc(Long productId);

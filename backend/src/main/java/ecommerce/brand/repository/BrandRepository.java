@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-@Repository
+@Repository("brandCatalogRepository")
 public interface BrandRepository extends JpaRepository<Brand, Long> {
 
     List<Brand> findByStatusOrderByNameAsc(String status);
