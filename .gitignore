@@ -28,6 +28,7 @@ API_DOCUMENTATION.md
 DO_AN_PROJECT_DOCUMENTATION.md
 DO_AN_Postman_Collection.md
 sample_data.sql
+sql.sql
 # Ignore local environment variables
 backend/.env
 
