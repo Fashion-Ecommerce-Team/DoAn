@@ -7,14 +7,15 @@ const apiClient = axios.create({
   },
 });
 
-// Interceptor cho Request
+// Interceptor cho Request: Tự động đính kèm JWT Bearer token
 apiClient.interceptors.request.use(
   (config) => {
-    // Có thể gắn token vào đây nếu user đã đăng nhập
-    // const token = localStorage.getItem('token');
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`;
-    // }
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('token');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    }
     return config;
   },
   (error) => Promise.reject(error)
@@ -26,6 +27,11 @@ apiClient.interceptors.response.use(
     return response;
   },
   (error) => {
+    if (error.response?.status === 401 && typeof window !== 'undefined') {
+      // Token hết hạn hoặc không hợp lệ
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+    }
     return Promise.reject(error);
   }
 );
