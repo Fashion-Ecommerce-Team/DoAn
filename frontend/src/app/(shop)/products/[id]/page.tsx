@@ -183,29 +183,115 @@ export default function ProductDetailPage() {
     );
   }
 
-  // Calculate unique colors and sizes from variants
-  const availableColors = Array.from(new Set(product.variants?.map((v) => v.color).filter(Boolean)));
-  const availableSizes = Array.from(new Set(product.variants?.map((v) => v.size).filter(Boolean)));
+  // Lấy tất cả màu sắc và kích cỡ (từ variants hoặc fallback có sẵn trên product)
+  const availableColors = Array.from(
+    new Set([
+      ...(product.variants?.map((v) => v.color).filter(Boolean) || []),
+      ...(product.availableColors || []),
+    ])
+  );
 
-  // Selected variant finding
-  const selectedVariant: ProductVariant | undefined = product.variants?.find((v) => {
-    const matchColor = !selectedColor || v.color === selectedColor;
-    const matchSize = !selectedSize || v.size === selectedSize;
-    return matchColor && matchSize;
-  });
+  const availableSizes = Array.from(
+    new Set([
+      ...(product.variants?.map((v) => v.size).filter(Boolean) || []),
+      ...(product.availableSizes || []),
+    ])
+  );
 
-  const currentStock = selectedVariant?.stockQuantity ?? product.totalStock ?? 0;
+  const hasVariants = Boolean(product.variants && product.variants.length > 0);
+
+  // Tìm biến thể khớp với cả màu và size đang chọn
+  const selectedVariant: ProductVariant | undefined = hasVariants
+    ? product.variants?.find((v) => {
+        const matchColor = !selectedColor || v.color.toLowerCase() === selectedColor.toLowerCase();
+        const matchSize = !selectedSize || v.size.toLowerCase() === selectedSize.toLowerCase();
+        return matchColor && matchSize;
+      })
+    : undefined;
+
+  // Tính số lượng tồn kho chính xác của biến thể
+  const currentStock = hasVariants
+    ? (selectedVariant ? selectedVariant.stockQuantity : 0)
+    : (product.totalStock ?? 0);
+
   const isOutOfStock = currentStock <= 0;
+
+  // Kiểm tra size có tồn tại và còn hàng cho màu đang chọn không
+  const checkSizeAvailable = (size: string) => {
+    if (!hasVariants) {
+      return { exists: true, stock: product.totalStock, isOutOfStock: product.totalStock <= 0 };
+    }
+    const match = product.variants?.find(
+      (v) =>
+        v.size.toLowerCase() === size.toLowerCase() &&
+        (!selectedColor || v.color.toLowerCase() === selectedColor.toLowerCase())
+    );
+    if (!match) return { exists: false, stock: 0, isOutOfStock: true };
+    return { exists: true, stock: match.stockQuantity, isOutOfStock: match.stockQuantity <= 0 };
+  };
+
+  // Kiểm tra màu có tồn tại và còn hàng không
+  const checkColorAvailable = (color: string) => {
+    if (!hasVariants) {
+      return { exists: true, stock: product.totalStock, isOutOfStock: product.totalStock <= 0 };
+    }
+    const matching = product.variants?.filter((v) => v.color.toLowerCase() === color.toLowerCase());
+    if (!matching || matching.length === 0) return { exists: false, stock: 0, isOutOfStock: true };
+    const totalColorStock = matching.reduce((sum, v) => sum + v.stockQuantity, 0);
+    return { exists: true, stock: totalColorStock, isOutOfStock: totalColorStock <= 0 };
+  };
+
+  // Hàm chọn màu thông minh: tự động chọn size tương thích nếu size hiện tại không có trong màu mới
+  const handleSelectColor = (color: string) => {
+    setSelectedColor(color);
+    if (hasVariants && selectedSize) {
+      const match = product.variants?.find(
+        (v) => v.color.toLowerCase() === color.toLowerCase() && v.size.toLowerCase() === selectedSize.toLowerCase()
+      );
+      if (!match || match.stockQuantity <= 0) {
+        // Tìm size đầu tiên còn hàng trong màu này
+        const firstInStock = product.variants?.find(
+          (v) => v.color.toLowerCase() === color.toLowerCase() && v.stockQuantity > 0
+        );
+        if (firstInStock) {
+          setSelectedSize(firstInStock.size);
+        }
+      }
+    }
+  };
+
+  // Hàm chọn size thông minh: tự động chọn màu tương thích nếu màu hiện tại không có size này
+  const handleSelectSize = (size: string) => {
+    setSelectedSize(size);
+    if (hasVariants && selectedColor) {
+      const match = product.variants?.find(
+        (v) => v.size.toLowerCase() === size.toLowerCase() && v.color.toLowerCase() === selectedColor.toLowerCase()
+      );
+      if (!match || match.stockQuantity <= 0) {
+        // Tìm màu đầu tiên còn hàng trong size này
+        const firstInStock = product.variants?.find(
+          (v) => v.size.toLowerCase() === size.toLowerCase() && v.stockQuantity > 0
+        );
+        if (firstInStock) {
+          setSelectedColor(firstInStock.color);
+        }
+      }
+    }
+  };
 
   // Pricing
   const formatPrice = (price?: number | null) => {
     if (!price) return '0₫';
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
   };
-  const hasDiscount = product.discountPrice && product.discountPrice < product.basePrice;
+  const effectiveBasePrice = selectedVariant?.price ?? product.basePrice;
+  const hasDiscount = Boolean(product.discountPrice && product.discountPrice < product.basePrice);
   const discountPercent = hasDiscount
     ? Math.round(((product.basePrice - product.discountPrice!) / product.basePrice) * 100)
     : 0;
+  const effectiveDiscountPrice = selectedVariant?.price
+    ? (hasDiscount ? Math.round(selectedVariant.price * (product.discountPrice! / product.basePrice)) : null)
+    : product.discountPrice;
 
   // Gallery image list
   const galleryImages = [
@@ -325,13 +411,36 @@ export default function ProductDetailPage() {
             {/* Price Box */}
             <div className="flex items-baseline gap-3 pt-1">
               <span className="text-2xl sm:text-3xl font-black text-neutral-950">
-                {formatPrice(product.discountPrice || product.basePrice)}
+                {formatPrice(effectiveDiscountPrice || effectiveBasePrice)}
               </span>
               {hasDiscount && (
                 <span className="text-base text-neutral-400 line-through font-normal">
-                  {formatPrice(product.basePrice)}
+                  {formatPrice(effectiveBasePrice)}
                 </span>
               )}
+            </div>
+
+            {/* SELECTED VARIANT SUMMARY CARD */}
+            <div className="p-3.5 bg-neutral-50 border border-neutral-200 rounded-xs flex items-center justify-between text-xs">
+              <div className="space-y-0.5">
+                <div className="flex items-center gap-1.5 font-bold uppercase tracking-wider text-neutral-900">
+                  <span>Phân loại:</span>
+                  <span className="text-black">
+                    {selectedColor || 'Chưa chọn màu'}
+                    {availableSizes.length > 0 ? ` • Size ${selectedSize || 'Chưa chọn'}` : ''}
+                  </span>
+                </div>
+                {selectedVariant?.sku && (
+                  <div className="text-[11px] font-mono text-neutral-500">
+                    Mã SKU: <span className="font-semibold text-neutral-700">{selectedVariant.sku}</span>
+                  </div>
+                )}
+              </div>
+              <div className="text-right">
+                <span className={`font-mono font-bold text-xs ${isOutOfStock ? 'text-red-500' : 'text-emerald-600'}`}>
+                  {isOutOfStock ? 'Hết hàng tạm thời' : `Còn lại: ${currentStock} sp`}
+                </span>
+              </div>
             </div>
 
             {/* COLOR SELECTOR */}
@@ -339,23 +448,28 @@ export default function ProductDetailPage() {
               <div className="space-y-2 pt-2 border-t border-neutral-100">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold uppercase tracking-wider text-neutral-900">
-                    Màu sắc: <span className="font-normal text-neutral-500">{selectedColor || 'Chọn màu'}</span>
+                    Màu sắc: <span className="font-normal text-neutral-500">{selectedColor || 'Vui lòng chọn màu'}</span>
                   </span>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {availableColors.map((color) => {
-                    const isSelected = selectedColor === color;
+                    const isSelected = selectedColor?.toLowerCase() === color?.toLowerCase();
+                    const { isOutOfStock: colorOutOfStock } = checkColorAvailable(color!);
+
                     return (
                       <button
                         key={color}
-                        onClick={() => setSelectedColor(color!)}
-                        className={`px-3.5 py-2 text-xs font-semibold border rounded-xs transition-all cursor-pointer ${
+                        onClick={() => handleSelectColor(color!)}
+                        className={`px-3.5 py-2 text-xs font-semibold border rounded-xs transition-all cursor-pointer flex items-center gap-1.5 ${
                           isSelected
                             ? 'bg-black text-white border-black ring-1 ring-black'
+                            : colorOutOfStock
+                            ? 'bg-neutral-50 text-neutral-400 border-neutral-200'
                             : 'bg-white text-neutral-800 border-neutral-300 hover:border-black'
                         }`}
                       >
-                        {color}
+                        <span>{color}</span>
+                        {colorOutOfStock && <span className="text-[10px] text-red-500">(Hết)</span>}
                       </button>
                     );
                   })}
@@ -368,7 +482,7 @@ export default function ProductDetailPage() {
               <div className="space-y-2 pt-3 border-t border-neutral-100">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold uppercase tracking-wider text-neutral-900">
-                    Kích thước: <span className="font-normal text-neutral-500">{selectedSize || 'Chọn size'}</span>
+                    Kích thước: <span className="font-normal text-neutral-500">{selectedSize || 'Vui lòng chọn size'}</span>
                   </span>
 
                   {/* Size Guide Trigger */}
@@ -382,26 +496,23 @@ export default function ProductDetailPage() {
 
                 <div className="flex flex-wrap gap-2">
                   {availableSizes.map((size) => {
-                    const isSelected = selectedSize === size;
-                    // Check stock for this size
-                    const variantForSize = product.variants?.find(
-                      (v) => v.size === size && (!selectedColor || v.color === selectedColor)
-                    );
-                    const sizeStock = variantForSize ? variantForSize.stockQuantity : product.totalStock;
-                    const sizeOutOfStock = sizeStock <= 0;
+                    const isSelected = selectedSize?.toLowerCase() === size?.toLowerCase();
+                    const { exists, isOutOfStock: sizeOutOfStock } = checkSizeAvailable(size!);
+                    const notAvailable = !exists || sizeOutOfStock;
 
                     return (
                       <button
                         key={size}
-                        disabled={sizeOutOfStock}
-                        onClick={() => setSelectedSize(size!)}
+                        disabled={notAvailable}
+                        onClick={() => handleSelectSize(size!)}
                         className={`min-w-[48px] h-11 px-3 flex items-center justify-center text-xs font-bold border rounded-xs transition-all cursor-pointer ${
                           isSelected
                             ? 'bg-black text-white border-black'
-                            : sizeOutOfStock
+                            : notAvailable
                             ? 'border-neutral-200 text-neutral-300 bg-neutral-50 line-through cursor-not-allowed'
                             : 'border-neutral-300 text-neutral-800 hover:border-black'
                         }`}
+                        title={notAvailable ? 'Size này tạm hết hàng cho màu đã chọn' : `Size ${size}`}
                       >
                         {size}
                       </button>
@@ -415,8 +526,8 @@ export default function ProductDetailPage() {
             <div className="space-y-2 pt-3 border-t border-neutral-100">
               <div className="flex items-center justify-between text-xs">
                 <span className="font-bold uppercase tracking-wider text-neutral-900">Số lượng:</span>
-                <span className={`font-mono ${isOutOfStock ? 'text-red-500 font-bold' : 'text-emerald-600'}`}>
-                  {isOutOfStock ? 'Hết hàng tạm thời' : `Còn lại: ${currentStock} sản phẩm`}
+                <span className={`font-mono ${isOutOfStock ? 'text-red-500 font-bold' : 'text-neutral-500'}`}>
+                  {isOutOfStock ? 'Hết hàng tạm thời' : `Tối đa ${currentStock} sản phẩm`}
                 </span>
               </div>
 
@@ -431,7 +542,7 @@ export default function ProductDetailPage() {
                   </button>
                   <span className="w-12 text-center text-sm font-bold font-mono">{quantity}</span>
                   <button
-                    onClick={() => setQuantity((q) => Math.min(currentStock, q + 1))}
+                    onClick={() => setQuantity((q) => Math.min(Math.max(1, currentStock), q + 1))}
                     disabled={quantity >= currentStock || isOutOfStock}
                     className="w-10 h-10 flex items-center justify-center text-neutral-600 hover:text-black disabled:opacity-30 cursor-pointer"
                   >
@@ -459,7 +570,21 @@ export default function ProductDetailPage() {
               <button
                 disabled={isOutOfStock}
                 onClick={() => {
-                  toast.success(`Đã thêm ${quantity} sản phẩm vào giỏ hàng! (Demo)`);
+                  if (availableColors.length > 0 && !selectedColor) {
+                    toast.error('Vui lòng chọn màu sắc trước khi thêm vào giỏ!');
+                    return;
+                  }
+                  if (availableSizes.length > 0 && !selectedSize) {
+                    toast.error('Vui lòng chọn kích thước trước khi thêm vào giỏ!');
+                    return;
+                  }
+                  if (isOutOfStock) {
+                    toast.error('Phân loại sản phẩm này tạm hết hàng!');
+                    return;
+                  }
+                  toast.success(
+                    `Đã thêm vào giỏ hàng: ${product.name} [${selectedColor ? selectedColor + ' - ' : ''}Size ${selectedSize || 'F'}] x${quantity}!`
+                  );
                 }}
                 className="w-full py-4 bg-black text-white hover:bg-neutral-800 disabled:opacity-40 disabled:cursor-not-allowed text-xs font-black uppercase tracking-widest transition-all rounded-xs flex items-center justify-center gap-2 cursor-pointer shadow-md"
               >
