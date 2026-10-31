@@ -1,18 +1,15 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import {
   ChevronLeft,
   ChevronRight,
-  Eye,
   MapPin,
   ShoppingBag,
   User,
   Phone,
   Mail,
-  Calendar,
-  ExternalLink
+  Calendar
 } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@admin/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@admin/components/ui/table';
@@ -23,6 +20,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { getUsers, updateUserStatus, deleteUser, updateUserRole, getUserAddresses, getOrders } from '@admin/services';
 import { UserResponse, UserAddressResponse, OrderResponse } from '@admin/types';
 import { toast } from 'sonner';
+import AdminSearchBar from '@/features/admin/components/common/AdminSearchBar';
+import AdminStatusBadge from '@/features/admin/components/common/AdminStatusBadge';
+import AdminPageHeader from '@/features/admin/components/common/AdminPageHeader';
+import { AdminViewButton, AdminToggleButton, AdminRoleButton, AdminDeleteButton } from '@/features/admin/components/common/AdminTableActions';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@admin/components/ui/dialog';
 import { Label } from '@admin/components/ui/label';
 
@@ -65,10 +66,7 @@ export default function UserPage() {
   };
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      loadUsers();
-    }, 400);
-    return () => clearTimeout(timer);
+    loadUsers();
   }, [search, status, page]);
 
   const handleUpdateStatus = async (id: number, newStatus: string) => {
@@ -150,50 +148,25 @@ export default function UserPage() {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
   };
 
-  const getOrderStatusBadge = (statusStr: string) => {
-    const baseClass = "inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-bold shadow-sm whitespace-nowrap";
-    switch (statusStr) {
-      case 'PENDING':
-        return <span className={`${baseClass} bg-amber-500 text-white`}>Chờ xử lý</span>;
-      case 'CONFIRMED':
-        return <span className={`${baseClass} bg-indigo-600 text-white`}>Đã xác nhận</span>;
-      case 'SHIPPED':
-        return <span className={`${baseClass} bg-blue-600 text-white`}>Đang giao</span>;
-      case 'COMPLETED':
-        return <span className={`${baseClass} bg-green-600 text-white`}>Hoàn thành</span>;
-      case 'CANCELLED':
-        return <span className={`${baseClass} bg-red-600 text-white`}>Đã hủy</span>;
-      default:
-        return <span className={`${baseClass} bg-slate-500 text-white`}>{statusStr || '---'}</span>;
-    }
-  };
-
-  const getStatusBadge = (statusStr: string) => {
-    const baseClass = "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold shadow-sm";
-    switch (statusStr) {
-      case 'ACTIVE': return <span className={`${baseClass} bg-green-600 text-white`}>Hoạt động</span>;
-      case 'INACTIVE': return <span className={`${baseClass} bg-slate-500 text-white`}>Tạm khóa</span>;
-      case 'DELETED': return <span className={`${baseClass} bg-red-600 text-white`}>Đã xóa</span>;
-      default: return <span className={`${baseClass} bg-slate-500 text-white`}>{statusStr}</span>;
-    }
-  };
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold tracking-tight text-slate-900">Quản lý Khách hàng</h2>
-          <p className="text-xs text-slate-500 mt-1">Tra cứu thông tin, lịch sử mua hàng và địa chỉ giao hàng của khách hàng</p>
-        </div>
-      </div>
+      <AdminPageHeader
+        title="Quản lý Khách hàng"
+        description="Tra cứu thông tin tài khoản, quyền hạn, lịch sử mua hàng và địa chỉ giao hàng"
+        badge={totalElements}
+      />
 
       <Card>
         <CardHeader className="flex flex-row items-center gap-4">
-          <Input
+          <AdminSearchBar
             placeholder="Tìm theo Tên, Email, Số điện thoại..."
-            className="max-w-md border-slate-300 text-slate-900 bg-slate-50 focus:bg-white text-sm"
-            value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(0); }}
+            defaultValue={search}
+            onSearch={(val) => {
+              setSearch(val);
+              setPage(0);
+            }}
+            className="w-full sm:max-w-md"
           />
           <Select value={status} onValueChange={(v) => { setStatus(v); setPage(0); }}>
             <SelectTrigger className="w-[180px] border-slate-300 text-xs font-semibold">
@@ -208,58 +181,52 @@ export default function UserPage() {
         </CardHeader>
         <CardContent>
           <Table>
-            <TableHeader>
+            <TableHeader className="bg-slate-50/80">
               <TableRow>
-                <TableHead className="font-bold text-slate-900">Họ Tên</TableHead>
-                <TableHead className="font-bold text-slate-900">Email</TableHead>
-                <TableHead className="font-bold text-slate-900">Số điện thoại</TableHead>
-                <TableHead className="text-center font-bold text-slate-900">Vai trò</TableHead>
-                <TableHead className="text-center font-bold text-slate-900">Trạng thái</TableHead>
-                <TableHead className="font-bold text-slate-900">Ngày tạo</TableHead>
-                <TableHead className="text-center font-bold text-slate-900">Hành động</TableHead>
+                <TableHead className="text-xs font-bold text-slate-700 py-3.5">Họ & Tên</TableHead>
+                <TableHead className="text-xs font-bold text-slate-700">Email</TableHead>
+                <TableHead className="text-xs font-bold text-slate-700">Số điện thoại</TableHead>
+                <TableHead className="text-center text-xs font-bold text-slate-700">Vai trò</TableHead>
+                <TableHead className="text-center text-xs font-bold text-slate-700">Trạng thái</TableHead>
+                <TableHead className="text-xs font-bold text-slate-700">Ngày tạo</TableHead>
+                <TableHead className="text-center text-xs font-bold text-slate-700">Hành động</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8 font-bold text-slate-700">Đang tải danh sách khách hàng...</TableCell>
+                  <TableCell colSpan={7} className="text-center py-12 font-bold text-slate-500">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <div className="w-8 h-8 border-3 border-[#0099FF] border-t-transparent rounded-full animate-spin" />
+                      <span className="text-xs">Đang tải danh sách khách hàng...</span>
+                    </div>
+                  </TableCell>
                 </TableRow>
               ) : users.length > 0 ? (
                 users.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell className="font-bold text-slate-900">{user.fullName}</TableCell>
-                    <TableCell className="font-medium text-slate-700">{user.email}</TableCell>
-                    <TableCell className="font-medium text-slate-700">{user.phone || '---'}</TableCell>
+                  <TableRow key={user.id} className="hover:bg-slate-50/70 transition-colors">
+                    <TableCell className="font-bold text-slate-900 text-xs">{user.fullName}</TableCell>
+                    <TableCell className="font-medium text-slate-700 text-xs">{user.email}</TableCell>
+                    <TableCell className="font-medium text-slate-700 text-xs">{user.phone || '---'}</TableCell>
                     <TableCell className="text-center">
-                      <Badge variant={user.roleId === 1 ? 'default' : 'secondary'} className={user.roleId === 1 ? 'bg-indigo-600' : ''}>
-                        {user.roleId === 1 ? 'Quản trị viên' : 'Khách hàng'}
-                      </Badge>
+                      <AdminStatusBadge status={user.roleId || 2} type="role" />
                     </TableCell>
-                    <TableCell className="text-center">{getStatusBadge(user.status)}</TableCell>
-                    <TableCell className="text-slate-500 text-sm whitespace-nowrap">{user.createdAt ? new Date(user.createdAt).toLocaleDateString('vi-VN') : '---'}</TableCell>
-                    <TableCell className="text-center space-x-1.5 whitespace-nowrap">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => openDetailModal(user)}
-                        className="font-bold border-blue-200 text-blue-700 hover:bg-blue-50"
-                      >
-                        <Eye className="w-3.5 h-3.5 mr-1" /> Chi tiết
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleUpdateStatus(user.id, user.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE')}
-                        className="font-bold text-slate-700 hover:bg-slate-50"
-                      >
-                        {user.status === 'ACTIVE' ? 'Tạm khóa' : 'Mở khóa'}
-                      </Button>
-                      <Button variant="outline" size="sm" onClick={() => openRoleDialog(user)} className="font-bold">
-                        Phân quyền
-                      </Button>
-                      <Button variant="destructive" size="sm" onClick={() => handleDelete(user.id)} className="font-bold">
-                        Xóa
-                      </Button>
+                    <TableCell className="text-center">
+                      <AdminStatusBadge status={user.status || ''} type="user" />
+                    </TableCell>
+                    <TableCell className="text-slate-500 text-xs whitespace-nowrap">
+                      {user.createdAt ? new Date(user.createdAt).toLocaleDateString('vi-VN') : '---'}
+                    </TableCell>
+                    <TableCell className="text-center space-x-1.5 whitespace-nowrap py-3">
+                      <AdminViewButton onClick={() => openDetailModal(user)} />
+                      <AdminToggleButton
+                        active={user.status === 'ACTIVE'}
+                        onToggle={() => handleUpdateStatus(user.id, user.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE')}
+                        activeLabel="Tạm khóa"
+                        inactiveLabel="Mở khóa"
+                      />
+                      <AdminRoleButton onClick={() => openRoleDialog(user)} label="Phân quyền" />
+                      <AdminDeleteButton onClick={() => handleDelete(user.id)} />
                     </TableCell>
                   </TableRow>
                 ))
@@ -407,13 +374,13 @@ export default function UserPage() {
                 <div className="space-y-3">
                   <div>
                     <span className="text-xs text-slate-400 block">Vai trò hệ thống</span>
-                    <Badge variant={selectedUser.roleId === 1 ? 'default' : 'secondary'} className={`mt-0.5 ${selectedUser.roleId === 1 ? 'bg-indigo-600' : ''}`}>
+                    <Badge variant={selectedUser.roleId === 1 ? 'default' : 'secondary'} className={`mt-0.5 ${selectedUser.roleId === 1 ? 'bg-[#0099FF]' : ''}`}>
                       {selectedUser.roleId === 1 ? 'Quản trị viên' : 'Khách hàng'}
                     </Badge>
                   </div>
                   <div>
                     <span className="text-xs text-slate-400 block">Trạng thái tài khoản</span>
-                    <div className="mt-0.5">{getStatusBadge(selectedUser.status)}</div>
+                    <div className="mt-0.5"><AdminStatusBadge status={selectedUser.status} type="user" /></div>
                   </div>
                   <div>
                     <span className="text-xs text-slate-400 block">Ngày tham gia hệ thống</span>
@@ -494,14 +461,10 @@ export default function UserPage() {
                               {formatCurrency(ord.totalAmount)}
                             </TableCell>
                             <TableCell className="text-center">
-                              {getOrderStatusBadge(ord.status)}
+                              <AdminStatusBadge status={ord.status || ''} type="order" />
                             </TableCell>
                             <TableCell className="text-right">
-                              <Button variant="ghost" size="sm" asChild className="text-xs text-blue-600 hover:text-blue-800 h-7 px-2">
-                                <Link href={`/admin/orders/${ord.id}`} target="_blank">
-                                  Xem đơn <ExternalLink className="w-3 h-3 ml-1" />
-                                </Link>
-                              </Button>
+                              <AdminViewButton href={`/admin/orders/${ord.id}`} />
                             </TableCell>
                           </TableRow>
                         ))}

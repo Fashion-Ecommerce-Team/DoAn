@@ -8,6 +8,8 @@ import {
   TicketPercent,
   Users,
   Star,
+  Sparkles,
+  Bot,
   LucideIcon
 } from 'lucide-react';
 
@@ -56,6 +58,13 @@ export const ADMIN_NAVIGATION: AdminNavGroup[] = [
     groupTitle: 'HỆ THỐNG & NGƯỜI DÙNG',
     items: [
       { name: 'Khách hàng', href: '/admin/users', icon: Users },
+    ],
+  },
+  {
+    groupTitle: 'TRÍ TUỆ NHÂN TẠO (AI)',
+    items: [
+      { name: 'Quản lý FashionCLIP', href: '/admin/fashion-clip', icon: Sparkles },
+      { name: 'Quản lý RAG & Chatbot', href: '/admin/rag-chatbot', icon: Bot },
     ],
   },
 ];

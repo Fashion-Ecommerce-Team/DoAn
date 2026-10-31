@@ -1,5 +1,5 @@
--- ============================================================
--- DATABASE SCHEMA — E-COMMERCE FASHION (HOÀN THIỆN)
+﻿-- ============================================================
+-- DATABASE SCHEMA â€” E-COMMERCE FASHION (HOÃ€N THIá»†N)
 -- ============================================================
 
 
@@ -11,11 +11,11 @@ USE ecommerce_fashion_db;
 
 
 -- ============================================================
--- PHẦN 1: HỆ THỐNG PHÂN QUYỀN & NGƯỜI DÙNG (3 bảng)
+-- PHáº¦N 1: Há»† THá»NG PHÃ‚N QUYá»€N & NGÆ¯á»œI DÃ™NG (3 báº£ng)
 -- ============================================================
 
 
--- BẢNG 1: roles
+-- Báº¢NG 1: roles
 CREATE TABLE roles (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50) NOT NULL UNIQUE,
@@ -26,7 +26,7 @@ CREATE TABLE roles (
 );
 
 
--- BẢNG 2: users
+-- Báº¢NG 2: users
 CREATE TABLE users (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
@@ -47,7 +47,7 @@ CREATE TABLE users (
 );
 
 
--- BẢNG 3: user_addresses
+-- Báº¢NG 3: user_addresses
 CREATE TABLE user_addresses (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,
@@ -64,11 +64,11 @@ CREATE TABLE user_addresses (
 
 
 -- ============================================================
--- PHẦN 2: DANH MỤC, THƯƠNG HIỆU & SẢN PHẨM (5 bảng)
+-- PHáº¦N 2: DANH Má»¤C, THÆ¯Æ NG HIá»†U & Sáº¢N PHáº¨M (5 báº£ng)
 -- ============================================================
 
 
--- BẢNG 4: categories (hỗ trợ phân cấp)
+-- Báº¢NG 4: categories (há»— trá»£ phÃ¢n cáº¥p)
 CREATE TABLE categories (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     parent_id BIGINT NULL,
@@ -83,7 +83,7 @@ CREATE TABLE categories (
 );
 
 
--- BẢNG 5: brands
+-- Báº¢NG 5: brands
 CREATE TABLE brands (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL UNIQUE,
@@ -95,7 +95,7 @@ CREATE TABLE brands (
 );
 
 
--- BẢNG 6: products
+-- Báº¢NG 6: products
 CREATE TABLE products (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     category_id BIGINT,
@@ -107,7 +107,7 @@ CREATE TABLE products (
     base_price DECIMAL(15, 2) NOT NULL,
     discount_price DECIMAL(15, 2),
     gender VARCHAR(20) DEFAULT 'UNISEX',
-    tags JSON,
+    tags VARCHAR(500),
     view_count INT DEFAULT 0,
     status VARCHAR(50) DEFAULT 'ACTIVE',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -121,7 +121,7 @@ CREATE TABLE products (
 );
 
 
--- BẢNG 7: product_variants
+-- Báº¢NG 7: product_variants
 CREATE TABLE product_variants (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     product_id BIGINT NOT NULL,
@@ -138,7 +138,7 @@ CREATE TABLE product_variants (
 );
 
 
--- BẢNG 8: product_images
+-- Báº¢NG 8: product_images
 CREATE TABLE product_images (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     product_id BIGINT NOT NULL,
@@ -153,11 +153,11 @@ CREATE TABLE product_images (
 
 
 -- ============================================================
--- PHẦN 3: TƯƠNG TÁC NGƯỜI DÙNG (4 bảng)
+-- PHáº¦N 3: TÆ¯Æ NG TÃC NGÆ¯á»œI DÃ™NG (4 báº£ng)
 -- ============================================================
 
 
--- BẢNG 9: wishlists
+-- Báº¢NG 9: wishlists
 CREATE TABLE wishlists (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,
@@ -169,7 +169,7 @@ CREATE TABLE wishlists (
 );
 
 
--- BẢNG 10: cart_items
+-- Báº¢NG 10: cart_items
 CREATE TABLE cart_items (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,
@@ -183,7 +183,7 @@ CREATE TABLE cart_items (
 );
 
 
--- BẢNG 11: reviews
+-- Báº¢NG 11: reviews
 CREATE TABLE reviews (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,
@@ -203,7 +203,7 @@ CREATE TABLE reviews (
 );
 
 
--- BẢNG 12: notifications (MỚI)
+-- Báº¢NG 12: notifications (Má»šI)
 CREATE TABLE notifications (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,
@@ -221,11 +221,11 @@ CREATE TABLE notifications (
 
 
 -- ============================================================
--- PHẦN 4: KHUYẾN MÃI, ĐƠN HÀNG & THANH TOÁN (5 bảng)
+-- PHáº¦N 4: KHUYáº¾N MÃƒI, ÄÆ N HÃ€NG & THANH TOÃN (5 báº£ng)
 -- ============================================================
 
 
--- BẢNG 13: coupons
+-- Báº¢NG 13: coupons
 CREATE TABLE coupons (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     code VARCHAR(50) NOT NULL UNIQUE,
@@ -243,7 +243,7 @@ CREATE TABLE coupons (
 );
 
 
--- BẢNG 14: orders
+-- Báº¢NG 14: orders
 CREATE TABLE orders (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,
@@ -267,7 +267,7 @@ CREATE TABLE orders (
 );
 
 
--- BẢNG 15: order_details (có snapshot sản phẩm)
+-- Báº¢NG 15: order_details (cÃ³ snapshot sáº£n pháº©m)
 CREATE TABLE order_details (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     order_id BIGINT NOT NULL,
@@ -284,7 +284,7 @@ CREATE TABLE order_details (
 );
 
 
--- BẢNG 16: payments
+-- Báº¢NG 16: payments
 CREATE TABLE payments (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     order_id BIGINT NOT NULL,
@@ -303,7 +303,7 @@ CREATE TABLE payments (
 );
 
 
--- BẢNG 17: order_status_history
+-- Báº¢NG 17: order_status_history
 CREATE TABLE order_status_history (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     order_id BIGINT NOT NULL,
@@ -319,11 +319,11 @@ CREATE TABLE order_status_history (
 
 
 -- ============================================================
--- PHẦN 5: NỘI DUNG TRANG CHỦ (1 bảng)
+-- PHáº¦N 5: Ná»˜I DUNG TRANG CHá»¦ (1 báº£ng)
 -- ============================================================
 
 
--- BẢNG 18: banners
+-- Báº¢NG 18: banners
 CREATE TABLE banners (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
@@ -340,11 +340,11 @@ CREATE TABLE banners (
 
 
 -- ============================================================
--- PHẦN 6: AI & CHATBOT (5 bảng)
+-- PHáº¦N 6: AI & CHATBOT (5 báº£ng)
 -- ============================================================
 
 
--- BẢNG 19: embedding_sync_log
+-- Báº¢NG 19: embedding_sync_log
 CREATE TABLE embedding_sync_log (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     product_id BIGINT NOT NULL,
@@ -353,6 +353,7 @@ CREATE TABLE embedding_sync_log (
     model_version VARCHAR(100) DEFAULT 'fashion-clip-v1',
     embedding_type VARCHAR(20) DEFAULT 'IMAGE',
     status VARCHAR(20) DEFAULT 'PENDING',
+    needs_resync BOOLEAN DEFAULT FALSE,
     error_message TEXT,
     synced_at TIMESTAMP NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -364,7 +365,7 @@ CREATE TABLE embedding_sync_log (
 );
 
 
--- BẢNG 20: policy_documents
+-- Báº¢NG 20: policy_documents
 CREATE TABLE policy_documents (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
@@ -375,6 +376,7 @@ CREATE TABLE policy_documents (
     is_active BOOLEAN DEFAULT TRUE,
     chunk_count INT DEFAULT 0,
     embedding_status VARCHAR(20) DEFAULT 'PENDING',
+    needs_resync BOOLEAN DEFAULT FALSE,
     created_by BIGINT NULL,
     updated_by BIGINT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -384,7 +386,7 @@ CREATE TABLE policy_documents (
 );
 
 
--- BẢNG 21: policy_chunks
+-- Báº¢NG 21: policy_chunks
 CREATE TABLE policy_chunks (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     document_id BIGINT NOT NULL,
@@ -401,7 +403,7 @@ CREATE TABLE policy_chunks (
 );
 
 
--- BẢNG 22: chat_sessions
+-- Báº¢NG 22: chat_sessions
 CREATE TABLE chat_sessions (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT,
@@ -417,7 +419,7 @@ CREATE TABLE chat_sessions (
 );
 
 
--- BẢNG 23: chat_messages
+-- Báº¢NG 23: chat_messages
 CREATE TABLE chat_messages (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     session_id BIGINT NOT NULL,
@@ -430,6 +432,8 @@ CREATE TABLE chat_messages (
     FOREIGN KEY (session_id) REFERENCES chat_sessions(id) ON DELETE CASCADE,
     INDEX idx_msg_session (session_id, created_at)
 );
+
+
 
 
 

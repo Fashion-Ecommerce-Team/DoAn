@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
@@ -19,12 +19,13 @@ import {
 } from '@admin/services';
 import { ProductResponse, ProductVariantResponse, ProductImageResponse, CategoryResponse, BrandResponse, ReviewResponse } from '@admin/types';
 import { toast } from 'sonner';
+import AdminStatusBadge from '@/features/admin/components/common/AdminStatusBadge';
+import { AdminToggleButton, AdminEditButton, AdminDeleteButton } from '@/features/admin/components/common/AdminTableActions';
 import {
   PackageOpen,
   ArrowLeft,
   Plus,
   Edit2,
-  Trash2,
   X,
   Upload,
   Star,
@@ -277,12 +278,6 @@ export default function ProductDetailsPage({ params }: { params: { id: string } 
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
   };
 
-  const getStatusBadge = (status: string) => {
-    const baseClass = "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold shadow-sm";
-    if (status === 'ACTIVE') return <span className={`${baseClass} bg-green-600 text-white`}>Đang bán</span>;
-    if (status === 'DELETED') return <span className={`${baseClass} bg-red-600 text-white`}>Đã xóa</span>;
-    return <span className={`${baseClass} bg-slate-500 text-white`}>Ngừng bán</span>;
-  };
 
   const renderStars = (rating: number) => {
     return (
@@ -446,7 +441,7 @@ export default function ProductDetailsPage({ params }: { params: { id: string } 
                 </div>
                 <div>
                   <div className="text-slate-500">Trạng thái kinh doanh</div>
-                  <div>{getStatusBadge(product.status)}</div>
+                  <div><AdminStatusBadge status={product.status} type="product" /></div>
                 </div>
               </div>
 
@@ -500,40 +495,18 @@ export default function ProductDetailsPage({ params }: { params: { id: string } 
                         {variant.stock}
                       </TableCell>
                       <TableCell className="text-center">
-                        {variant.status
-                          ? <Badge className="bg-emerald-100 text-emerald-800 border-none font-medium hover:bg-emerald-100">Hoạt động</Badge>
-                          : <Badge className="bg-slate-100 text-slate-600 border-none font-medium hover:bg-slate-100">Tạm ẩn</Badge>
-                        }
+                        <AdminStatusBadge status={variant.status ? 'ACTIVE' : 'INACTIVE'} type="active" />
                       </TableCell>
-                      <TableCell className="text-center">
+                      <TableCell className="text-center py-3">
                         <div className="inline-flex items-center justify-center gap-1.5 whitespace-nowrap">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="h-8 text-xs px-2.5"
-                            onClick={() => handleToggleVariantStatus(variant.id)}
-                            title="Bật/Tắt trạng thái hoạt động"
-                          >
-                            Đổi TT
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="h-8 w-8 p-0"
-                            onClick={() => openVariantModal(variant)}
-                            title="Sửa biến thể"
-                          >
-                            <Edit2 className="w-3.5 h-3.5" />
-                          </Button>
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            className="h-8 w-8 p-0"
-                            onClick={() => handleDeleteVariant(variant.id)}
-                            title="Xóa biến thể"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </Button>
+                          <AdminToggleButton
+                            active={Boolean(variant.status)}
+                            onToggle={() => handleToggleVariantStatus(variant.id)}
+                            activeLabel="Tạm ẩn"
+                            inactiveLabel="Hoạt động"
+                          />
+                          <AdminEditButton onClick={() => openVariantModal(variant)} />
+                          <AdminDeleteButton onClick={() => handleDeleteVariant(variant.id)} />
                         </div>
                       </TableCell>
                     </TableRow>
@@ -645,10 +618,7 @@ export default function ProductDetailsPage({ params }: { params: { id: string } 
                             <span className="text-xs text-slate-400">
                               {rev.createdAt ? new Date(rev.createdAt).toLocaleDateString('vi-VN') : '---'}
                             </span>
-                            <span className={`inline-flex items-center rounded-full px-2 py-0.2 text-[10px] font-bold ${rev.status === 'ACTIVE' || rev.status === 'APPROVED' ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-600'
-                              }`}>
-                              {rev.status === 'ACTIVE' || rev.status === 'APPROVED' ? 'Hiển thị' : 'Bị ẩn'}
-                            </span>
+                            <AdminStatusBadge status={rev.status} type="review" />
                           </div>
                         </div>
                       </div>
@@ -656,22 +626,13 @@ export default function ProductDetailsPage({ params }: { params: { id: string } 
                       {/* Số sao & Nút thao tác Admin */}
                       <div className="flex items-center gap-2 whitespace-nowrap">
                         {renderStars(rev.rating || 5)}
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleToggleReviewStatus(rev.id, rev.status)}
-                          className="h-8 text-xs font-semibold px-3"
-                        >
-                          {rev.status === 'ACTIVE' || rev.status === 'APPROVED' ? 'Ẩn' : 'Hiện'}
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleDeleteReview(rev.id)}
-                          className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
+                        <AdminToggleButton
+                          active={rev.status === 'ACTIVE' || rev.status === 'APPROVED'}
+                          onToggle={() => handleToggleReviewStatus(rev.id, rev.status)}
+                          activeLabel="Ẩn"
+                          inactiveLabel="Hiện"
+                        />
+                        <AdminDeleteButton onClick={() => handleDeleteReview(rev.id)} />
                       </div>
                     </div>
 

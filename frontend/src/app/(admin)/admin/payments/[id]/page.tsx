@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
@@ -160,7 +160,7 @@ export default function PaymentDetailPage() {
             <Button
               onClick={() => openStatusModal('REFUNDED')}
               disabled={actionLoading}
-              className="font-bold bg-indigo-600 hover:bg-indigo-700 text-white"
+              className="font-bold bg-[#0099FF] hover:bg-[#0084e0] text-white shadow-sm shadow-[#0099FF]/20"
             >
               <Undo2 className="w-4 h-4 mr-1.5" />
               Hoàn tiền
@@ -197,7 +197,7 @@ export default function PaymentDetailPage() {
 
         <Card className="border-slate-200 shadow-sm">
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-lg bg-sky-50 text-[#0077cc] flex items-center justify-center">
               <ShoppingCart className="w-5 h-5" />
             </div>
             <div>
@@ -283,7 +283,7 @@ export default function PaymentDetailPage() {
           <Card className="border-slate-200 shadow-sm">
             <CardHeader className="border-b bg-slate-50/50 py-3.5">
               <CardTitle className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <FileText className="w-4 h-4 text-indigo-600" />
+                <FileText className="w-4 h-4 text-[#0099FF]" />
                 Phản hồi từ cổng thanh toán
               </CardTitle>
               <CardDescription>Dữ liệu thô do cổng thanh toán trả về (nếu có)</CardDescription>
@@ -368,8 +368,8 @@ export default function PaymentDetailPage() {
                   <span className="font-semibold text-slate-800">{payment.orderStatus || '---'}</span>
                 </div>
               </div>
-              <Button asChild variant="outline" size="sm" className="w-full font-bold border-blue-200 text-blue-700 hover:bg-blue-50">
-                <Link href={`/admin/orders/${payment.orderId}`}>Xem chi tiết đơn hàng</Link>
+              <Button asChild variant="outline" size="sm" className="w-full font-semibold border-sky-200 text-[#0077cc] hover:bg-sky-50 rounded-xl">
+                <Link href={`/admin/orders/${payment.orderId}`}>Chi tiết đơn hàng</Link>
               </Button>
             </CardContent>
           </Card>

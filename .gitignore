@@ -4,11 +4,8 @@ frontend/dist/
 frontend/.next/
 frontend/.turbo/
 
-
 # Backend
 backend/target/
-
-
 
 # IDE
 .idea/
@@ -28,5 +25,15 @@ API_DOCUMENTATION.md
 DO_AN_PROJECT_DOCUMENTATION.md
 DO_AN_Postman_Collection.md
 sample_data.sql
+
 # Ignore local environment variables
 backend/.env
+.env
+
+# Data generation & CSV docs
+doc/
+import_fashion_data.sql
+generate_import_sql.py
+backend_backup_temp/
+ai-service_local_backup/
+ai-service/

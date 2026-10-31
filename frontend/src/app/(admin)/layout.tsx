@@ -12,7 +12,7 @@ export default function AdminLayout({
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900">
       {/* Sidebar: Fixed on desktop, Drawer on mobile */}
       <AdminSidebar
         mobileOpen={mobileOpen}

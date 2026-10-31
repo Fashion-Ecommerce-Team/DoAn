@@ -7,7 +7,7 @@ export default function ShopLayout({
     <div className="flex flex-col min-h-screen bg-white">
       {/* Navbar Placeholder */}
       <header className="h-16 bg-white border-b flex items-center justify-between px-8 shadow-sm sticky top-0 z-50">
-        <div className="text-2xl font-bold text-slate-800">FashionStore</div>
+        <div className="text-2xl font-bold text-slate-800">Seeme</div>
         <nav>
           <ul className="flex space-x-6 text-slate-600">
             <li className="hover:text-blue-600 cursor-pointer">Trang chủ</li>
@@ -24,7 +24,7 @@ export default function ShopLayout({
 
       {/* Footer Placeholder */}
       <footer className="bg-slate-900 text-slate-400 py-8 text-center">
-        <p>&copy; 2026 Fashion E-commerce. All rights reserved.</p>
+        <p>&copy; 2026 Seeme. All rights reserved.</p>
       </footer>
     </div>
   );

@@ -3,20 +3,21 @@ package ecommerce.admin.service.impl;
 import ecommerce.admin.dto.request.ProductVariantRequest;
 import ecommerce.admin.dto.response.ProductVariantResponse;
 import ecommerce.admin.entity.ProductVariant;
-import ecommerce.common.constant.EntityStatus;
 import ecommerce.admin.repository.ProductVariantRepository;
+import ecommerce.admin.service.EmbeddingSyncService;
 import ecommerce.admin.service.ProductVariantService;
+import ecommerce.common.constant.EntityStatus;
+import ecommerce.common.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ecommerce.common.exception.ResourceNotFoundException;
 
 import java.text.Normalizer;
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
 public class ProductVariantServiceImpl implements ProductVariantService {
     private final ProductVariantRepository variantRepository;
+    private final EmbeddingSyncService embeddingSyncService;
 
     @Override
     public ProductVariantResponse addVariant(Long productId, ProductVariantRequest request) {
@@ -29,8 +30,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
 
         if (variantRepository.existsByProductIdAndSizeIgnoreCaseAndColorIgnoreCase(productId, size, color)) {
             throw new IllegalArgumentException(
-                    String.format("Biến thể với kích cỡ '%s' và màu sắc '%s' đã tồn tại cho sản phẩm này", size,
-                            color));
+                    String.format("Biến thể với kích cỡ '%s' và màu sắc '%s' đã tồn tại cho sản phẩm này", size, color));
         }
 
         String sku = request.getSku() != null && !request.getSku().trim().isEmpty()
@@ -46,7 +46,13 @@ public class ProductVariantServiceImpl implements ProductVariantService {
                 .stockQuantity(request.getStockQuantity() != null ? request.getStockQuantity() : 0)
                 .status(EntityStatus.ACTIVE)
                 .build();
-        return mapToResponse(variantRepository.save(variant));
+
+        ProductVariant saved = variantRepository.save(variant);
+
+        // Cập nhật trường in_stock trong Qdrant
+        embeddingSyncService.refreshProductPayload(productId);
+
+        return mapToResponse(saved);
     }
 
     @Override
@@ -64,8 +70,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
         if (variantRepository.existsByProductIdAndSizeIgnoreCaseAndColorIgnoreCaseAndIdNot(variant.getProductId(), size,
                 color, variantId)) {
             throw new IllegalArgumentException(
-                    String.format("Biến thể với kích cỡ '%s' và màu sắc '%s' đã tồn tại cho sản phẩm này", size,
-                            color));
+                    String.format("Biến thể với kích cỡ '%s' và màu sắc '%s' đã tồn tại cho sản phẩm này", size, color));
         }
 
         variant.setSize(size.toUpperCase());
@@ -78,12 +83,23 @@ public class ProductVariantServiceImpl implements ProductVariantService {
             variant.setStockQuantity(request.getStockQuantity());
         }
 
-        return mapToResponse(variantRepository.save(variant));
+        ProductVariant saved = variantRepository.save(variant);
+
+        // Cập nhật trường in_stock trong Qdrant
+        embeddingSyncService.refreshProductPayload(saved.getProductId());
+
+        return mapToResponse(saved);
     }
 
     @Override
     public void deleteVariant(Long variantId) {
+        ProductVariant variant = variantRepository.findById(variantId)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy biến thể"));
+        Long productId = variant.getProductId();
         variantRepository.deleteById(variantId);
+
+        // Cập nhật lại in_stock
+        embeddingSyncService.refreshProductPayload(productId);
     }
 
     @Override
@@ -93,6 +109,9 @@ public class ProductVariantServiceImpl implements ProductVariantService {
         variant.setStatus(
                 EntityStatus.ACTIVE.equals(variant.getStatus()) ? EntityStatus.INACTIVE : EntityStatus.ACTIVE);
         variantRepository.save(variant);
+
+        // Cập nhật lại in_stock
+        embeddingSyncService.refreshProductPayload(variant.getProductId());
     }
 
     private ProductVariantResponse mapToResponse(ProductVariant v) {
@@ -101,7 +120,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
         res.setSize(v.getSize().toUpperCase());
         res.setColor(v.getColor());
         res.setStock(v.getStockQuantity());
-        res.setStatus("ACTIVE".equals(v.getStatus()));
+        res.setStatus(EntityStatus.ACTIVE.equals(v.getStatus()));
         return res;
     }
 
@@ -110,14 +129,12 @@ public class ProductVariantServiceImpl implements ProductVariantService {
             return "";
         }
 
-        String slugStringnew = Normalizer.normalize(slugString, Normalizer.Form.NFD)
+        return Normalizer.normalize(slugString, Normalizer.Form.NFD)
                 .replaceAll("\\p{M}", "")
                 .toLowerCase()
                 .replaceAll("đ", "d")
                 .replaceAll("[^a-z0-9]+", "-")
                 .replaceAll("^-|-$", "");
-
-        return slugStringnew;
     }
 
     private String formatName(String name) {
