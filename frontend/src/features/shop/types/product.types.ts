@@ -60,7 +60,9 @@ export interface ProductDetail extends ProductSummary {
 export interface ProductFilterParams {
   keyword?: string;
   categoryId?: number;
+  categorySlug?: string;
   brandId?: number;
+  brandSlug?: string;
   gender?: string;
   minPrice?: number;
   maxPrice?: number;
