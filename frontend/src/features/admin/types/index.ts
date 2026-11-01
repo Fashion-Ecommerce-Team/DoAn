@@ -8,3 +8,4 @@ export * from './adminProduct.type';
 export * from './adminReview.type';
 export * from './adminUser.type';
 export * from './adminResponse.type';
+export * from './adminEmbedding.type';

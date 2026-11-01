@@ -32,3 +32,7 @@ export const adminProductApi = productApi;
 export const adminReviewApi = reviewApi;
 export const adminUploadApi = uploadApi;
 export const adminUserApi = userApi;
+
+export * from './adminEmbedding.api';
+import * as embeddingApi from './adminEmbedding.api';
+export const adminEmbeddingApi = embeddingApi;

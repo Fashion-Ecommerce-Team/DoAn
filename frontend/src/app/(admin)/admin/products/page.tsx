@@ -1,12 +1,13 @@
 'use client';
 
+import { GENDER_OPTIONS, getGenderLabel } from '@admin/utils/adminProduct.util';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader } from '@admin/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@admin/components/ui/table';
 import { Button } from '@admin/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@admin/components/ui/select';
-import { getProducts, deleteProduct, getProductById, toggleProductStatus, getCategories, getBrands } from '@admin/services';
+import { getProducts, deleteProduct, getProductById, toggleProductStatus, getCategories, getAllBrands } from '@admin/services';
 import { ProductResponse, ProductImageResponse } from '@admin/types';
 import { toast } from 'sonner';
 import { PackageOpen, ChevronLeft, ChevronRight, Plus, RotateCcw } from 'lucide-react';
@@ -67,12 +68,12 @@ export default function ProductPage() {
 
   const loadDependencies = async () => {
     try {
-      const [cats, brnds] = await Promise.all([getCategories(0, 100), getBrands(0, 100)]);
+      const [cats, brnds] = await Promise.all([getCategories(0, 100), getAllBrands()]);
       const catMap = cats.content.reduce((acc, cat) => {
         acc[cat.id] = cat.name;
         return acc;
       }, {} as Record<number, string>);
-      const brandMap = brnds.content.reduce((acc, brand) => {
+      const brandMap = brnds.reduce((acc, brand) => {
         acc[brand.id] = brand.name;
         return acc;
       }, {} as Record<number, string>);
@@ -245,9 +246,7 @@ export default function ProductPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="ALL">Tất cả giới tính</SelectItem>
-                <SelectItem value="MALE">Nam (Male)</SelectItem>
-                <SelectItem value="FEMALE">Nữ (Female)</SelectItem>
-                <SelectItem value="UNISEX">Nam & Nữ (Unisex)</SelectItem>
+                {GENDER_OPTIONS.map((o) => (<SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>))}
               </SelectContent>
             </Select>
 
@@ -366,13 +365,7 @@ export default function ProductPage() {
 
                       {/* Gender */}
                       <TableCell className="text-xs font-medium text-slate-700">
-                        {prod.gender === 'MALE'
-                          ? 'Nam'
-                          : prod.gender === 'FEMALE'
-                          ? 'Nữ'
-                          : prod.gender === 'UNISEX'
-                          ? 'Nam & Nữ'
-                          : '---'}
+                        {getGenderLabel(prod.gender)}
                       </TableCell>
 
                       {/* View count */}

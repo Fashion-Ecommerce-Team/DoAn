@@ -1,5 +1,6 @@
 'use client';
 
+import { getGenderLabel } from '@admin/utils/adminProduct.util';
 import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@admin/components/ui/card';
@@ -14,7 +15,7 @@ import {
   addVariant, updateVariant, deleteVariant, toggleVariantStatus,
   uploadImage, addProductImage, deleteProductImage, setPrimaryProductImage,
   getCategories,
-  getBrands,
+  getAllBrands,
   getReviews, updateReviewStatus, deleteReview
 } from '@admin/services';
 import { ProductResponse, ProductVariantResponse, ProductImageResponse, CategoryResponse, BrandResponse, ReviewResponse } from '@admin/types';
@@ -70,12 +71,12 @@ export default function ProductDetailsPage({ params }: { params: { id: string } 
       const [prodData, catsData, brandsData] = await Promise.all([
         getProductById(Number(params.id)),
         getCategories(0, 100),
-        getBrands(0, 100)
+        getAllBrands()
       ]);
       setProduct(prodData);
 
       const catMap = catsData.content.reduce((acc: Record<number, string>, cat: CategoryResponse) => { acc[cat.id] = cat.name; return acc; }, {});
-      const brandMap = brandsData.content.reduce((acc: Record<number, string>, brand: BrandResponse) => { acc[brand.id] = brand.name; return acc; }, {});
+      const brandMap = brandsData.reduce((acc: Record<number, string>, brand: BrandResponse) => { acc[brand.id] = brand.name; return acc; }, {});
       setCategories(catMap);
       setBrands(brandMap);
     } catch {
@@ -436,7 +437,7 @@ export default function ProductDetailsPage({ params }: { params: { id: string } 
                 <div>
                   <div className="text-slate-500">Đối tượng / Giới tính</div>
                   <div className="font-bold text-slate-800">
-                    {product.gender === 'MALE' ? 'Nam' : product.gender === 'FEMALE' ? 'Nữ' : 'Nam và Nữ (Unisex)'}
+                    {getGenderLabel(product.gender)}
                   </div>
                 </div>
                 <div>
