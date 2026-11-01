@@ -41,6 +41,12 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "LIMIT 20", nativeQuery = true)
     List<Map<String, Object>> getTopSellingProducts();
 
+    /** Sản phẩm chưa bị xóa và chưa có embedding SUCCESS nào. */
+    @Query("SELECT p FROM Product p WHERE p.status <> ecommerce.common.constant.EntityStatus.DELETED AND " +
+           "(:keyword IS NULL OR :keyword = '' OR LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))) AND " +
+           "NOT EXISTS (SELECT 1 FROM EmbeddingSyncLog l WHERE l.productId = p.id AND l.status = 'SUCCESS')")
+    Page<Product> findProductsWithoutEmbedding(@Param("keyword") String keyword, Pageable pageable);
+
     @Query("SELECT p.id FROM Product p WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :kw, '%'))")
     List<Long> findIdsByKeyword(@Param("kw") String keyword);
 }

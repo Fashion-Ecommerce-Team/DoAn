@@ -114,6 +114,17 @@ public class EmbeddingJobServiceImpl implements EmbeddingJobService {
         return job;
     }
 
+    @Override
+    public JobProgressResponse cancelJob(String jobId) {
+        JobProgressResponse job = jobStore.get(jobId);
+        if (job != null && "RUNNING".equals(job.getStatus())) {
+            job.setStatus("CANCELLED");
+            job.setMessage("Tiến trình đã được người dùng dừng lại.");
+            job.setFinishedAt(LocalDateTime.now());
+        }
+        return job;
+    }
+
     /**
      * Job tự động chạy lúc 2h sáng (mặc định tắt, bật khi cấu hình embedding.reconcile.enabled=true)
      */
@@ -138,6 +149,11 @@ public class EmbeddingJobServiceImpl implements EmbeddingJobService {
         int skipped = 0;
 
         for (Long pid : productIds) {
+            if ("CANCELLED".equals(job.getStatus())) {
+                log.info("Batch sync job {} đã bị hủy bởi người dùng.", jobId);
+                return;
+            }
+            job.setMessage(String.format("Đang xử lý sản phẩm #%d (%d/%d)...", pid, processed + 1, productIds.size()));
             try {
                 if (onlyMissing) {
                     List<EmbeddingSyncLog> existing = logRepo.findByProductId(pid);
@@ -182,6 +198,11 @@ public class EmbeddingJobServiceImpl implements EmbeddingJobService {
         int failed = 0;
 
         for (Long pid : productIds) {
+            if ("CANCELLED".equals(job.getStatus())) {
+                log.info("Batch sync job {} đã bị hủy bởi người dùng.", jobId);
+                return;
+            }
+            job.setMessage(String.format("Đang xử lý sản phẩm #%d (%d/%d)...", pid, processed + 1, productIds.size()));
             try {
                 // Thử cập nhật payload nhẹ trước
                 syncService.refreshProductPayload(pid);

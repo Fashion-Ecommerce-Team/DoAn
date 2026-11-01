@@ -22,7 +22,9 @@ public class QdrantClient {
                         @Value("${qdrant.api-key:}") String apiKey,
                         @Value("${qdrant.collection}") String collection,
                         @Value("${qdrant.vector-size}") int vectorSize) {
-        RestClient.Builder b = RestClient.builder().baseUrl(url);
+        RestClient.Builder b = RestClient.builder()
+                .requestFactory(new org.springframework.http.client.SimpleClientHttpRequestFactory())
+                .baseUrl(url);
         if (apiKey != null && !apiKey.isBlank()) {
             b.defaultHeader("api-key", apiKey);
         }

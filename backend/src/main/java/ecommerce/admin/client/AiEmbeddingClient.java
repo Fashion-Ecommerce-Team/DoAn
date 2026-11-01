@@ -24,7 +24,10 @@ public class AiEmbeddingClient {
 
     public AiEmbeddingClient(@Value("${ai.service.url}") String baseUrl,
                              @Value("${qdrant.vector-size}") int expectedDimension) {
-        this.rest = RestClient.builder().baseUrl(baseUrl).build();
+        this.rest = RestClient.builder()
+                .requestFactory(new org.springframework.http.client.SimpleClientHttpRequestFactory())
+                .baseUrl(baseUrl)
+                .build();
         this.expectedDimension = expectedDimension;
     }
 

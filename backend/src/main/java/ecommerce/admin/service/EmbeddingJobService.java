@@ -10,4 +10,6 @@ public interface EmbeddingJobService {
     JobProgressResponse startReconcile();
 
     JobProgressResponse getJobProgress(String jobId);
+
+    JobProgressResponse cancelJob(String jobId);
 }

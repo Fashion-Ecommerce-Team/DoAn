@@ -46,6 +46,13 @@ public class EmbeddingSyncServiceImpl implements EmbeddingSyncService {
     }
 
     @Override
+    public PageResponse<ecommerce.admin.dto.response.MissingEmbeddingProductResponse> getMissingProducts(String keyword, int page, int size) {
+        var pageable = PageRequest.of(page, size, Sort.by("id").descending());
+        return PageResponse.of(productRepo.findProductsWithoutEmbedding(keyword, pageable)
+                .map(ecommerce.admin.dto.response.MissingEmbeddingProductResponse::from));
+    }
+
+    @Override
     public Map<String, Object> getStatus() {
         long totalProducts = productRepo.count();
         long syncedProducts = logRepo.countSyncedProducts();
@@ -259,6 +266,7 @@ public class EmbeddingSyncServiceImpl implements EmbeddingSyncService {
     public Map<String, Object> qdrantInfo() {
         Map<String, Object> info = new LinkedHashMap<>();
         try {
+            qdrant.ensureCollection();
             info.putAll(qdrant.info());
         } catch (Exception e) {
             info.put("error", e.getMessage());

@@ -33,6 +33,16 @@ public class AdminEmbeddingController {
                 syncService.getList(status, productId, page, size));
     }
 
+    /** Danh sách sản phẩm chưa có vector embedding (chưa đồng bộ) */
+    @GetMapping("/missing")
+    public ApiResponse<PageResponse<ecommerce.admin.dto.response.MissingEmbeddingProductResponse>> getMissing(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ApiResponse.success("Lấy danh sách sản phẩm chưa có vector thành công",
+                syncService.getMissingProducts(keyword, page, size));
+    }
+
     /** 2. Thống kê tổng quan trạng thái đồng bộ vector */
     @GetMapping("/status")
     public ApiResponse<Map<String, Object>> getStatus() {
@@ -77,6 +87,12 @@ public class AdminEmbeddingController {
     @GetMapping("/jobs/{jobId}")
     public ApiResponse<JobProgressResponse> getJobProgress(@PathVariable String jobId) {
         return ApiResponse.success("Lấy tiến độ tiến trình thành công", jobService.getJobProgress(jobId));
+    }
+
+    /** Hủy/dừng tiến trình đang chạy */
+    @PostMapping("/jobs/{jobId}/cancel")
+    public ApiResponse<JobProgressResponse> cancelJob(@PathVariable String jobId) {
+        return ApiResponse.success("Đã dừng tiến trình", jobService.cancelJob(jobId));
     }
 
     /** 8. Admin chủ động kích hoạt kiểm tra và sửa lệch dữ liệu (Reconcile) */

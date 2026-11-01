@@ -9,6 +9,8 @@ public interface EmbeddingSyncService {
 
     PageResponse<EmbeddingLogResponse> getList(String status, Long productId, int page, int size);
 
+    PageResponse<ecommerce.admin.dto.response.MissingEmbeddingProductResponse> getMissingProducts(String keyword, int page, int size);
+
     Map<String, Object> getStatus();
 
     Map<String, Object> syncProduct(Long productId);
