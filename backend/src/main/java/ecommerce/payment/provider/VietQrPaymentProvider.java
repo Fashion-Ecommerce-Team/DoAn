@@ -28,24 +28,57 @@ public class VietQrPaymentProvider implements PaymentProvider {
             BigDecimal amount,
             String description) {
 
-        if (bankId.isBlank()
-                || accountNo.isBlank()
-                || accountName.isBlank()) {
+        if (paymentId == null || paymentId <= 0) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Payment ID không hợp lệ");
+        }
+
+        if (bankId == null || bankId.isBlank()
+                || accountNo == null || accountNo.isBlank()
+                || accountName == null || accountName.isBlank()) {
+
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "Chưa cấu hình thông tin ngân hàng VietQR");
         }
 
+        if (!bankId.trim().matches("[A-Za-z0-9]{2,20}")
+                || !accountNo.trim().matches("[0-9]{6,19}")) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Mã ngân hàng hoặc số tài khoản không hợp lệ");
+        }
+
+        if (amount == null
+                || amount.compareTo(BigDecimal.ZERO) <= 0
+                || amount.stripTrailingZeros().scale() > 0) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Số tiền thanh toán không hợp lệ");
+        }
+
+        String transferContent =
+                description == null || description.isBlank()
+                ? "PAY" + paymentId
+                : description.trim();
+
         String encodedName = URLEncoder.encode(
-                accountName, StandardCharsets.UTF_8);
+                accountName.trim(),
+                StandardCharsets.UTF_8);
 
         String encodedDescription = URLEncoder.encode(
-                description, StandardCharsets.UTF_8);
+                transferContent,
+                StandardCharsets.UTF_8);
 
         return "https://img.vietqr.io/image/"
-                + bankId + "-" + accountNo
+                + bankId.trim()
+                + "-"
+                + accountNo.trim()
                 + "-compact2.png"
-                + "?amount=" + amount.toBigInteger()
+                + "?amount=" + amount.toBigIntegerExact()
                 + "&addInfo=" + encodedDescription
                 + "&accountName=" + encodedName;
     }

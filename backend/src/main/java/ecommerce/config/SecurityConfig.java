@@ -61,6 +61,7 @@ public class SecurityConfig {
                         .permitAll()
                         .requestMatchers("/api/admin/**", "/api/v1/admin/**")
                         .permitAll()
+                            .requestMatchers("/internal/ai/rag/products").permitAll()
                         .anyRequest().authenticated())
                 .formLogin(form -> form.disable())
                 .httpBasic(basic -> basic.disable())

@@ -1,49 +1,73 @@
+
 package ecommerce.cart.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class CartItemResponse {
-
     private Long id;
     private Long productVariantId;
     private Integer quantity;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public CartItemResponse() {
-    }
+    private Long productId;
+    private String productName;
+    private String imageUrl;
+    private String size;
+    private String color;
+    private BigDecimal price;
+    private Integer stockQuantity;
+    public void setId(Long id) {
+    this.id = id;
+}
 
-    public CartItemResponse(
-            Long id,
-            Long productVariantId,
-            Integer quantity,
-            LocalDateTime createdAt,
-            LocalDateTime updatedAt
-    ) {
-        this.id = id;
-        this.productVariantId = productVariantId;
-        this.quantity = quantity;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-    }
+public void setProductVariantId(Long productVariantId) {
+    this.productVariantId = productVariantId;
+}
 
-    public Long getId() {
-        return id;
-    }
+public void setQuantity(Integer quantity) {
+    this.quantity = quantity;
+}
 
-    public Long getProductVariantId() {
-        return productVariantId;
-    }
+public void setCreatedAt(LocalDateTime createdAt) {
+    this.createdAt = createdAt;
+}
 
-    public Integer getQuantity() {
-        return quantity;
-    }
+public void setUpdatedAt(LocalDateTime updatedAt) {
+    this.updatedAt = updatedAt;
+}
+public void setProductId(Long productId) {
+    this.productId = productId;
+}
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
+public void setProductName(String productName) {
+    this.productName = productName;
+}
 
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
+public void setImageUrl(String imageUrl) {
+    this.imageUrl = imageUrl;
+}
+
+public void setSize(String size) {
+    this.size = size;
+}
+
+public void setColor(String color) {
+    this.color = color;
+}
+
+public void setPrice(BigDecimal price) {
+    this.price = price;
+}
+
+public void setStockQuantity(Integer stockQuantity) {
+    this.stockQuantity = stockQuantity;
+}
 }

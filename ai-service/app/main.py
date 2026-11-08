@@ -1,7 +1,9 @@
+
 import json
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional, List
+
 from app.models.schemas import (
     SyncCatalogRequest,
     ImageSearchRequest,
@@ -11,6 +13,10 @@ from app.models.schemas import (
     SearchResultItem
 )
 from app.services.fashion_clip_service import get_engine
+
+# RAG - Qdrant + SentenceTransformer + Gemini
+from app.rag.router import router as rag_router
+
 
 app = FastAPI(
     title="Fashion E-Commerce AI Service",
@@ -26,10 +32,29 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# ==========================================
+# RAG ROUTER
+# ==========================================
+# Đăng ký các endpoint chatbot RAG:
+# POST /api/v1/ai/chat
+# POST /api/v1/ai/rag/sync-products
+
+app.include_router(rag_router)
+
+
+# ==========================================
+# FASHIONCLIP - STARTUP
+# ==========================================
+
 @app.on_event("startup")
 async def startup_event():
     # Warm up FashionCLIP model on startup
     get_engine()
+
+
+# ==========================================
+# FASHIONCLIP - HEALTH CHECK
+# ==========================================
 
 @app.get("/health")
 def health_check():
@@ -42,6 +67,11 @@ def health_check():
         "indexed_products": len(engine.product_vectors)
     }
 
+
+# ==========================================
+# FASHIONCLIP - SYNC CATALOG
+# ==========================================
+
 @app.post("/api/v1/ai/sync-catalog")
 def sync_catalog(request: SyncCatalogRequest):
     engine = get_engine()
@@ -51,6 +81,11 @@ def sync_catalog(request: SyncCatalogRequest):
         "message": f"Đồng bộ thành công {len(request.products)} sản phẩm vào Fashion-CLIP index!",
         "indexed_total": total
     }
+
+
+# ==========================================
+# FASHIONCLIP - IMAGE SEARCH
+# ==========================================
 
 @app.post("/api/v1/ai/search/image", response_model=SearchResponse)
 async def search_by_image(
@@ -87,6 +122,11 @@ async def search_by_image(
         total=len(results),
         results=results
     )
+
+
+# ==========================================
+# FASHIONCLIP - HYBRID SEARCH
+# ==========================================
 
 @app.post("/api/v1/ai/search/hybrid", response_model=SearchResponse)
 async def search_hybrid(
@@ -133,10 +173,19 @@ async def search_hybrid(
         results=results
     )
 
+
+# ==========================================
+# FASHIONCLIP - TEXT SEARCH
+# ==========================================
+
 @app.post("/api/v1/ai/search/text", response_model=SearchResponse)
 def search_by_text(request: TextSearchRequest):
     engine = get_engine()
-    results = engine.search_by_text(request.keyword, candidate_ids=request.candidateIds, top_k=request.topK)
+    results = engine.search_by_text(
+        request.keyword,
+        candidate_ids=request.candidateIds,
+        top_k=request.topK
+    )
     return SearchResponse(
         success=True,
         message="Tìm kiếm ngữ nghĩa đa phương thức theo văn bản thành công!",
