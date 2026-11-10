@@ -19,20 +19,28 @@ public class PolicyChunk {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(name = "document_id")
     private Long documentId;
-    @Column(name = "chunk_text")
+
+    @Column(name = "chunk_text", columnDefinition = "LONGTEXT")
     private String chunkText;
+
     @Column(name = "chunk_index")
     private Integer chunkIndex;
+
     @Column(name = "char_start")
     private Integer charStart;
+
     @Column(name = "char_end")
     private Integer charEnd;
+
     @Column(name = "qdrant_point_id")
     private String qdrantPointId;
+
     @Column(name = "is_embedded")
     private Boolean isEmbedded;
+
     @CreatedDate
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

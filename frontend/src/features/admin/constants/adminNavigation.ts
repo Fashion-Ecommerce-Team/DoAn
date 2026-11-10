@@ -9,7 +9,7 @@ import {
   Users,
   Star,
   Sparkles,
-  Bot,
+  BookOpen,
   LucideIcon
 } from 'lucide-react';
 
@@ -64,7 +64,7 @@ export const ADMIN_NAVIGATION: AdminNavGroup[] = [
     groupTitle: 'TRÍ TUỆ NHÂN TẠO (AI)',
     items: [
       { name: 'Quản lý FashionCLIP', href: '/admin/fashion-clip', icon: Sparkles },
-      { name: 'Quản lý RAG & Chatbot', href: '/admin/rag-chatbot', icon: Bot },
+      { name: 'Tài liệu Chính sách (RAG)', href: '/admin/policies', icon: BookOpen },
     ],
   },
 ];

@@ -9,3 +9,4 @@ export * from './adminReview.type';
 export * from './adminUser.type';
 export * from './adminResponse.type';
 export * from './adminEmbedding.type';
+export * from './adminPolicy.type';

@@ -9,6 +9,8 @@ export * from './adminProduct.api';
 export * from './adminReview.api';
 export * from './adminUpload.api';
 export * from './adminUser.api';
+export * from './adminEmbedding.api';
+export * from './adminPolicy.api';
 
 // Namespaced API objects to avoid any name collision with client/shop APIs
 import * as brandApi from './adminBrand.api';
@@ -21,6 +23,8 @@ import * as productApi from './adminProduct.api';
 import * as reviewApi from './adminReview.api';
 import * as uploadApi from './adminUpload.api';
 import * as userApi from './adminUser.api';
+import * as embeddingApi from './adminEmbedding.api';
+import * as policyApi from './adminPolicy.api';
 
 export const adminBrandApi = brandApi;
 export const adminCategoryApi = categoryApi;
@@ -32,7 +36,5 @@ export const adminProductApi = productApi;
 export const adminReviewApi = reviewApi;
 export const adminUploadApi = uploadApi;
 export const adminUserApi = userApi;
-
-export * from './adminEmbedding.api';
-import * as embeddingApi from './adminEmbedding.api';
 export const adminEmbeddingApi = embeddingApi;
+export const adminPolicyApi = policyApi;

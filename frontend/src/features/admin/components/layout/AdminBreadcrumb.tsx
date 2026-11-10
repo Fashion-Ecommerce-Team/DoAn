@@ -15,6 +15,7 @@ const ROUTE_LABELS: Record<string, string> = {
   users: 'Khách hàng',
   reviews: 'Đánh giá',
   'fashion-clip': 'Quản lý FashionCLIP',
+  policies: 'Tài liệu Chính sách (RAG)',
   create: 'Thêm mới',
   edit: 'Chỉnh sửa',
 };

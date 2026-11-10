@@ -371,6 +371,8 @@ CREATE TABLE policy_documents (
     title VARCHAR(255) NOT NULL,
     slug VARCHAR(255) UNIQUE,
     content LONGTEXT NOT NULL,
+    file_name VARCHAR(255) NULL,
+    file_url VARCHAR(500) NULL,
     category VARCHAR(50) NOT NULL,
     version INT DEFAULT 1,
     is_active BOOLEAN DEFAULT TRUE,
@@ -390,7 +392,7 @@ CREATE TABLE policy_documents (
 CREATE TABLE policy_chunks (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     document_id BIGINT NOT NULL,
-    chunk_text TEXT NOT NULL,
+    chunk_text LONGTEXT NOT NULL,
     chunk_index INT NOT NULL,
     char_start INT NOT NULL DEFAULT 0,
     char_end INT NOT NULL DEFAULT 0,

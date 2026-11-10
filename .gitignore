@@ -36,4 +36,10 @@ import_fashion_data.sql
 generate_import_sql.py
 backend_backup_temp/
 ai-service_local_backup/
-ai-service/
+# Python & AI Service
+__pycache__/
+*.py[cod]
+.pytest_cache/
+ai-service/.venv/
+ai-service/venv/
+ai-service/env/
