@@ -1,52 +1,66 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@admin/components/ui/card';
 import { QdrantInfo, EmbeddingStatus } from '@admin/types';
-import { Database } from 'lucide-react';
+import { Database, Cpu, RefreshCw } from 'lucide-react';
 
-function Row({ label, value }: { label: string; value: React.ReactNode }) {
-  return (
-    <div className="flex items-center justify-between py-2.5 border-b border-slate-100 last:border-0 text-xs">
-      <span className="font-semibold text-slate-500">{label}</span>
-      <span className="font-bold text-slate-900 font-mono">{value ?? '---'}</span>
-    </div>
-  );
+interface QdrantInfoCardProps {
+  info: QdrantInfo | null;
+  status: EmbeddingStatus | null;
+  loading: boolean;
+  onRefresh?: () => void;
 }
 
-export default function QdrantInfoCard({ info, status, loading }: { info: QdrantInfo | null; status: EmbeddingStatus | null; loading: boolean }) {
+export default function QdrantInfoCard({ info, status, loading, onRefresh }: QdrantInfoCardProps) {
   const hasError = !!info?.error;
   const vec = info?.config?.params?.vectors;
+  const modelName = info?.modelVersion ?? status?.modelVersion ?? 'fashion-clip-v1';
+  const collectionName = info?.collection ?? status?.collection ?? 'product_embeddings';
+  const pointsCount = info?.points_count ?? info?.vectors_count ?? status?.successPoints ?? 0;
+  const vectorDim = vec?.size ?? 512;
+  const distance = vec?.distance ?? 'Cosine';
+
   return (
-    <Card className="border border-slate-200/80 shadow-xs">
-      <CardHeader className="flex flex-row items-center justify-between pb-4 border-b border-slate-100 space-y-0">
-        <div>
-          <CardTitle className="text-base font-bold text-slate-900 flex items-center gap-2">
-            <Database className="w-4 h-4 text-[#0099FF]" />
-            Qdrant Vector Database
-          </CardTitle>
-          <CardDescription className="mt-0.5">Thông tin collection lưu trữ vector sản phẩm</CardDescription>
-        </div>
-        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold border shadow-xs ${
-          loading ? 'bg-slate-100 text-slate-600 border-slate-200/80'
-            : hasError ? 'bg-rose-50 text-rose-700 border-rose-200/80' : 'bg-emerald-50 text-emerald-700 border-emerald-200/80'
-        }`}>
-          {loading ? 'Đang tải' : hasError ? 'Mất kết nối' : (info?.status ?? 'Hoạt động')}
+    <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 bg-slate-50/90 border border-slate-200/80 rounded-xl text-xs">
+      {/* Model Info */}
+      <div className="flex items-center gap-2 text-slate-600 flex-wrap">
+        <Cpu className="w-4 h-4 text-sky-500" />
+        <span className="font-semibold text-slate-700">Model:</span>
+        <span className="font-mono text-slate-800 bg-white px-2 py-0.5 rounded border border-slate-200 text-[11px]">
+          {modelName} (patrickjohncyh/fashion-clip)
         </span>
-      </CardHeader>
-      <CardContent className="pt-4">
-        {hasError ? (
-          <p className="text-xs text-rose-600 font-medium break-words">{info?.error}</p>
-        ) : (
-          <>
-            <Row label="Collection" value={info?.collection ?? status?.collection} />
-            <Row label="Số điểm (points)" value={info?.points_count} />
-            <Row label="Số vector" value={info?.vectors_count ?? info?.points_count} />
-            <Row label="Số chiều" value={vec?.size} />
-            <Row label="Độ đo" value={vec?.distance} />
-            <Row label="Model" value={info?.modelVersion ?? status?.modelVersion} />
-          </>
+        <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200">
+          {vectorDim} chiều • {distance}
+        </span>
+      </div>
+
+      {/* Qdrant Info */}
+      <div className="flex items-center gap-2 text-slate-600">
+        <Database className="w-4 h-4 text-indigo-500" />
+        <span className="font-semibold text-slate-700">Qdrant:</span>
+        <span className="font-mono text-slate-800">{collectionName}</span>
+        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-sky-50 text-[#0099FF] border border-sky-200">
+          {pointsCount.toLocaleString('vi-VN')} points
+        </span>
+        <span
+          className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${
+            hasError
+              ? 'bg-rose-50 text-rose-700 border-rose-200'
+              : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+          }`}
+        >
+          {loading ? 'Đang tải' : hasError ? 'Mất kết nối' : (info?.status ?? 'green')}
+        </span>
+        {onRefresh && (
+          <button
+            onClick={onRefresh}
+            disabled={loading}
+            className="text-slate-400 hover:text-slate-700 transition-colors ml-0.5 cursor-pointer"
+            title="Tải lại số liệu Qdrant"
+          >
+            <RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} />
+          </button>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

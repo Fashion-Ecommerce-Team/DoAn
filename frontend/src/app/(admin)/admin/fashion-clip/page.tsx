@@ -247,12 +247,15 @@ export default function FashionClipPage() {
         }
       />
 
+      {/* Thanh thông tin Qdrant & Model tinh gọn (tương tự như RAG) */}
+      <QdrantInfoCard info={qdrant} status={stats} loading={overviewLoading} onRefresh={loadOverview} />
+
       <EmbeddingStatsCards status={stats} loading={overviewLoading} />
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <QdrantInfoCard info={qdrant} status={stats} loading={overviewLoading} />
+      {/* Tiến trình đồng bộ chạy ngầm (chỉ hiển thị khi có tiến trình) */}
+      {job && (
         <SyncJobProgress job={job} onCancel={handleCancelJob} onClear={handleClearJob} />
-      </div>
+      )}
 
       <Card>
         <CardHeader className="flex flex-col gap-3 py-4">
