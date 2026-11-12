@@ -1,6 +1,8 @@
 'use client';
 
 import { Menu, Bell, ShieldCheck } from 'lucide-react';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store';
 import AdminBreadcrumb from './AdminBreadcrumb';
 
 interface AdminHeaderProps {
@@ -8,6 +10,13 @@ interface AdminHeaderProps {
 }
 
 export default function AdminHeader({ onOpenMobileSidebar }: AdminHeaderProps) {
+  const { user } = useSelector((state: RootState) => state.auth);
+  const initials = (user?.fullName || 'AD')
+    .split(' ')
+    .filter(Boolean)
+    .slice(-2)
+    .map((w) => w[0]?.toUpperCase())
+    .join('');
   return (
     <header className="h-16 bg-white border-b border-slate-200/80 sticky top-0 z-20 flex items-center justify-between px-4 sm:px-6 shadow-sm">
       {/* Left: Mobile hamburger + Breadcrumbs */}
@@ -42,12 +51,12 @@ export default function AdminHeader({ onOpenMobileSidebar }: AdminHeaderProps) {
         {/* Admin User Profile Pill */}
         <div className="flex items-center gap-2.5 pl-1">
           <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-xs ring-2 ring-slate-100 shadow-sm">
-            AD
+            {initials || 'AD'}
           </div>
           <div className="hidden sm:flex flex-col text-left">
-            <span className="text-xs font-bold text-slate-800 leading-tight">Quản trị viên</span>
+            <span className="text-xs font-bold text-slate-800 leading-tight">{user?.fullName || 'Quản trị viên'}</span>
             <span className="text-[10px] text-blue-600 font-semibold flex items-center gap-0.5">
-              <ShieldCheck className="w-3 h-3" /> Full Access
+              <ShieldCheck className="w-3 h-3" /> ROLE_ADMIN
             </span>
           </div>
         </div>

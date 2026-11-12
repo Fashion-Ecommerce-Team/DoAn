@@ -46,6 +46,7 @@ export interface ProductSummary {
   totalStock: number;
   availableSizes?: string[];
   availableColors?: string[];
+  variants?: ProductVariant[];
   similarityScore?: number | null;
   createdAt?: string;
 }
@@ -60,7 +61,9 @@ export interface ProductDetail extends ProductSummary {
 export interface ProductFilterParams {
   keyword?: string;
   categoryId?: number;
+  categorySlug?: string;
   brandId?: number;
+  brandSlug?: string;
   gender?: string;
   minPrice?: number;
   maxPrice?: number;

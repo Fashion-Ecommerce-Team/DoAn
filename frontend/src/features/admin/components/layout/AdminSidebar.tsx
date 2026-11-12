@@ -1,8 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { ShieldCheck, LogOut, X } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { ShieldCheck, LogOut, Store, X } from 'lucide-react';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '@/store';
+import { logout } from '@/features/auth/authSlice';
+import { toast } from 'sonner';
 import { ADMIN_NAVIGATION } from '../../constants/adminNavigation';
 import { cn } from '@/utils';
 
@@ -13,6 +17,15 @@ interface AdminSidebarProps {
 
 export default function AdminSidebar({ mobileOpen = false, onCloseMobile }: AdminSidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const dispatch = useDispatch();
+  const { user } = useSelector((state: RootState) => state.auth);
+
+  const handleAdminLogout = () => {
+    dispatch(logout());
+    toast.success('Đã đăng xuất khỏi trang Quản trị');
+    router.push('/login');
+  };
 
   const sidebarContent = (
     <div className="flex flex-col h-full bg-slate-900 text-slate-300">
@@ -97,16 +110,24 @@ export default function AdminSidebar({ mobileOpen = false, onCloseMobile }: Admi
             <ShieldCheck className="w-4 h-4" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-bold text-white truncate">Administrator</p>
-            <p className="text-[11px] text-slate-400 truncate">admin@system.local</p>
+            <p className="text-xs font-bold text-white truncate">{user?.fullName || 'Administrator'}</p>
+            <p className="text-[11px] text-slate-400 truncate">{user?.email || 'admin@system.local'}</p>
           </div>
           <Link
             href="/"
-            title="Quay lại Shop"
+            title="Về giao diện Cửa hàng"
+            className="p-1.5 text-slate-400 hover:text-blue-400 hover:bg-slate-800 rounded-md transition-colors"
+          >
+            <Store className="w-4 h-4" />
+          </Link>
+          <button
+            type="button"
+            onClick={handleAdminLogout}
+            title="Đăng xuất"
             className="p-1.5 text-slate-400 hover:text-red-400 hover:bg-slate-800 rounded-md transition-colors"
           >
             <LogOut className="w-4 h-4" />
-          </Link>
+          </button>
         </div>
       </div>
     </div>
