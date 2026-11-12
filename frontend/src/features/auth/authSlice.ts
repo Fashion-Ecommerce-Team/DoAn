@@ -10,6 +10,12 @@ export interface AuthUser {
   avatarUrl?: string;
 }
 
+export function isAdminRole(role?: string | null): boolean {
+  if (!role) return false;
+  const normalized = role.trim().toUpperCase();
+  return normalized === 'ROLE_ADMIN' || normalized === 'ADMIN';
+}
+
 interface AuthState {
   isAuthenticated: boolean;
   user: AuthUser | null;

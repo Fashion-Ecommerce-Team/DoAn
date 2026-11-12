@@ -2,12 +2,10 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Heart, Sparkles } from 'lucide-react';
+import { Heart } from 'lucide-react';
 import { ProductSummary } from '@/features/shop/types/product.types';
 import { wishlistApi } from '@/features/shop/services/wishlist.api';
 import { toast } from 'sonner';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/store';
 
 interface ProductCardProps {
   product: ProductSummary;
@@ -20,10 +18,19 @@ export default function ProductCard({
   isWishlisted = false,
   onWishlistChange,
 }: ProductCardProps) {
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
   const [inWishlist, setInWishlist] = useState(isWishlisted);
   const [isHovered, setIsHovered] = useState(false);
   const [isToggling, setIsToggling] = useState(false);
+
+  // Sync state with local storage on mount
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const ids = wishlistApi.getLocalWishlistIds();
+      if (ids.includes(product.id)) {
+        setInWishlist(true);
+      }
+    }
+  }, [product.id]);
 
   // Fallback image placeholder
   const primaryImg = product.primaryImageUrl || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80';
@@ -45,11 +52,6 @@ export default function ProductCard({
     e.preventDefault();
     e.stopPropagation();
 
-    if (!isAuthenticated) {
-      toast.info('Vui lòng đăng nhập để lưu sản phẩm vào danh sách yêu thích!');
-      return;
-    }
-
     if (isToggling) return;
     setIsToggling(true);
 
@@ -60,7 +62,16 @@ export default function ProductCard({
         onWishlistChange?.(product.id, false);
         toast.success(`Đã xóa "${product.name}" khỏi mục yêu thích`);
       } else {
-        await wishlistApi.addToWishlist(product.id);
+        await wishlistApi.addToWishlist(product.id, {
+          name: product.name,
+          slug: product.slug,
+          basePrice: product.basePrice,
+          discountPrice: product.discountPrice,
+          primaryImageUrl: product.primaryImageUrl,
+          categoryName: product.category?.name,
+          brandName: product.brand?.name,
+          inStock: product.totalStock > 0,
+        });
         setInWishlist(true);
         onWishlistChange?.(product.id, true);
         toast.success(`Đã thêm "${product.name}" vào mục yêu thích`);
@@ -110,8 +121,8 @@ export default function ProductCard({
             </span>
           )}
           {product.similarityScore && (
-            <span className="bg-neutral-900/90 text-amber-300 text-[9px] font-bold tracking-wider px-1.5 py-0.5 rounded-xs flex items-center gap-1">
-              <Sparkles size={9} /> AI Match {Math.round(product.similarityScore * 100)}%
+            <span className="bg-neutral-900/90 text-white text-[9px] font-bold tracking-wider px-1.5 py-0.5 rounded-xs">
+              Độ phù hợp: {Math.round(product.similarityScore * 100)}%
             </span>
           )}
         </div>

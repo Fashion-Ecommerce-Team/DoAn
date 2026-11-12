@@ -10,12 +10,14 @@ import {
   Menu, 
   X, 
   LogOut, 
-  MapPin
+  MapPin,
+  ShieldCheck
 } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store';
-import { logout } from '@/features/auth/authSlice';
+import { logout, isAdminRole } from '@/features/auth/authSlice';
 import { toast } from 'sonner';
+import { wishlistApi } from '@/features/shop/services/wishlist.api';
 
 interface ShopNavbarProps {
   onOpenSearch?: () => void;
@@ -32,6 +34,20 @@ export default function ShopNavbar({ onOpenSearch, wishlistCount = 0 }: ShopNavb
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [liveWishlistCount, setLiveWishlistCount] = useState(wishlistCount);
+
+  // Sync real-time wishlist count
+  useEffect(() => {
+    const updateCount = () => {
+      if (typeof window !== 'undefined') {
+        const ids = wishlistApi.getLocalWishlistIds();
+        setLiveWishlistCount(ids.length);
+      }
+    };
+    updateCount();
+    window.addEventListener('wishlist_updated', updateCount);
+    return () => window.removeEventListener('wishlist_updated', updateCount);
+  }, []);
 
   // Scroll effect
   useEffect(() => {
@@ -173,7 +189,7 @@ export default function ShopNavbar({ onOpenSearch, wishlistCount = 0 }: ShopNavb
                 >
                   <Heart size={16} className="stroke-[2.2]" />
                   <span className="absolute -top-1.5 -right-2 min-w-[15px] h-[15px] px-1 bg-black text-white rounded-full text-[9px] font-bold flex items-center justify-center">
-                    {wishlistCount}
+                    {liveWishlistCount}
                   </span>
                 </Link>
               </div>
@@ -187,11 +203,29 @@ export default function ShopNavbar({ onOpenSearch, wishlistCount = 0 }: ShopNavb
                   {isAuthenticated ? (
                     <>
                       <div className="px-4 py-2 border-b border-neutral-100">
-                        <p className="text-[11px] text-neutral-400 font-medium uppercase tracking-wider">Tài khoản</p>
+                        <div className="flex items-center justify-between">
+                          <p className="text-[11px] text-neutral-400 font-medium uppercase tracking-wider">Tài khoản</p>
+                          <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-xs ${
+                            isAdminRole(currentUser?.role)
+                              ? 'bg-indigo-100 text-indigo-700'
+                              : 'bg-neutral-100 text-neutral-600'
+                          }`}>
+                            {isAdminRole(currentUser?.role) ? 'Admin' : 'Khách hàng'}
+                          </span>
+                        </div>
                         <p className="text-xs font-bold text-neutral-900 truncate mt-0.5">
                           {currentUser?.fullName || currentUser?.email}
                         </p>
                       </div>
+
+                      {isAdminRole(currentUser?.role) && (
+                        <Link
+                          href="/admin"
+                          className="flex items-center px-4 py-2.5 text-xs font-bold text-indigo-700 bg-indigo-50/70 hover:bg-indigo-100 transition-colors border-b border-neutral-100"
+                        >
+                          <ShieldCheck size={14} className="mr-2 text-indigo-600" /> Trang quản trị (Admin)
+                        </Link>
+                      )}
 
                       <Link
                         href="/profile"
@@ -306,6 +340,15 @@ export default function ShopNavbar({ onOpenSearch, wishlistCount = 0 }: ShopNavb
 
               {/* Extra Account links */}
               <div className="pt-4 space-y-2">
+                {isAuthenticated && isAdminRole(currentUser?.role) && (
+                  <Link
+                    href="/admin"
+                    className="flex items-center gap-2 py-2.5 px-3 rounded-xs bg-indigo-50 text-xs font-bold uppercase tracking-wider text-indigo-700"
+                  >
+                    <ShieldCheck size={15} /> Trang quản trị (Admin)
+                  </Link>
+                )}
+
                 <Link
                   href="/wishlist"
                   className="flex items-center justify-between py-2 text-xs font-bold uppercase tracking-wider text-neutral-800"
@@ -314,7 +357,7 @@ export default function ShopNavbar({ onOpenSearch, wishlistCount = 0 }: ShopNavb
                     <Heart size={15} /> Sản phẩm yêu thích
                   </span>
                   <span className="bg-black text-white px-2 py-0.5 rounded-full text-[10px]">
-                    {wishlistCount}
+                    {liveWishlistCount}
                   </span>
                 </Link>
 

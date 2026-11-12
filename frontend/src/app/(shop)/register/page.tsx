@@ -4,8 +4,7 @@ import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { authApi } from '@/features/auth/services/auth.api';
-import { toast } from 'sonner';
-import { Eye, EyeOff, ArrowRight, User, Mail, Phone, Lock } from 'lucide-react';
+import { Eye, EyeOff, ArrowRight, User, Mail, Phone, Lock, CheckCircle2, AlertCircle, X } from 'lucide-react';
 
 function RegisterForm() {
   const router = useRouter();
@@ -24,44 +23,46 @@ function RegisterForm() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setFeedback(null);
 
     // 1. Validate Full Name
     if (!formData.fullName.trim()) {
-      toast.error('Vui lòng nhập họ và tên của bạn');
+      setFeedback({ type: 'error', message: 'Vui lòng nhập họ và tên của bạn' });
       return;
     }
 
     // 2. Validate Email
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailRegex.test(formData.email.trim())) {
-      toast.error('Email không hợp lệ (ví dụ: user@example.com)');
+      setFeedback({ type: 'error', message: 'Email không hợp lệ (ví dụ: user@example.com)' });
       return;
     }
 
     // 3. Validate Phone Number (Spring Boot requires ^0[0-9]{9}$)
     const phoneRegex = /^0[0-9]{9}$/;
     if (!phoneRegex.test(formData.phone.trim())) {
-      toast.error('Số điện thoại phải bắt đầu bằng số 0 và bao gồm đúng 10 chữ số');
+      setFeedback({ type: 'error', message: 'Số điện thoại phải bắt đầu bằng số 0 và bao gồm đúng 10 chữ số' });
       return;
     }
 
     // 4. Validate Password Length
     if (formData.password.length < 6) {
-      toast.error('Mật khẩu cần tối thiểu 6 ký tự');
+      setFeedback({ type: 'error', message: 'Mật khẩu cần tối thiểu 6 ký tự' });
       return;
     }
 
     // 5. Validate Password Match
     if (formData.password !== formData.confirmPassword) {
-      toast.error('Mật khẩu xác nhận không khớp');
+      setFeedback({ type: 'error', message: 'Mật khẩu xác nhận không khớp' });
       return;
     }
 
     if (!agreeTerms) {
-      toast.error('Vui lòng đồng ý với điều khoản sử dụng của SEEME');
+      setFeedback({ type: 'error', message: 'Vui lòng đồng ý với điều khoản sử dụng của SEEME' });
       return;
     }
 
@@ -74,17 +75,20 @@ function RegisterForm() {
         password: formData.password,
       });
 
-      toast.success(message || 'Đăng ký tài khoản thành công! Vui lòng đăng nhập.');
+      setFeedback({
+        type: 'success',
+        message: message || 'Đăng ký tài khoản thành công! Đang chuyển sang trang đăng nhập...',
+      });
       
       setTimeout(() => {
         router.push(`/login${redirectUrl !== '/' ? `?redirect=${encodeURIComponent(redirectUrl)}` : ''}`);
-      }, 500);
+      }, 600);
     } catch (err: unknown) {
       const errorMsg =
         (err as { response?: { data?: { message?: string; error?: string } } })?.response?.data?.message ||
         (err as { response?: { data?: { message?: string; error?: string } } })?.response?.data?.error ||
         'Đăng ký không thành công. Email hoặc số điện thoại có thể đã được đăng ký.';
-      toast.error(errorMsg);
+      setFeedback({ type: 'error', message: errorMsg });
     } finally {
       setLoading(false);
     }
@@ -110,6 +114,35 @@ function RegisterForm() {
             Đăng ký để nhận thông báo sớm các bộ sưu tập giới hạn
           </p>
         </div>
+
+        {/* Inline Status Banner */}
+        {feedback && (
+          <div
+            role="status"
+            className={`mt-5 p-3 rounded-xs border text-xs font-medium flex items-start justify-between gap-2.5 animate-in fade-in duration-150 ${
+              feedback.type === 'success'
+                ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+                : 'bg-red-50 border-red-200 text-red-700'
+            }`}
+          >
+            <div className="flex items-start gap-2">
+              {feedback.type === 'success' ? (
+                <CheckCircle2 size={15} className="text-emerald-600 shrink-0 mt-0.5" />
+              ) : (
+                <AlertCircle size={15} className="text-red-600 shrink-0 mt-0.5" />
+              )}
+              <span className="leading-relaxed">{feedback.message}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setFeedback(null)}
+              className="text-current opacity-60 hover:opacity-100 transition-opacity shrink-0"
+              aria-label="Đóng thông báo"
+            >
+              <X size={14} />
+            </button>
+          </div>
+        )}
 
         {/* Register Form */}
         <form className="mt-6 space-y-4" onSubmit={handleSubmit}>

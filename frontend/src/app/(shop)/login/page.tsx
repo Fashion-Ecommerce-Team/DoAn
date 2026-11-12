@@ -4,10 +4,9 @@ import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useDispatch } from 'react-redux';
-import { setCredentials } from '@/features/auth/authSlice';
+import { setCredentials, isAdminRole } from '@/features/auth/authSlice';
 import { authApi } from '@/features/auth/services/auth.api';
-import { toast } from 'sonner';
-import { Eye, EyeOff, ArrowRight, Lock, Mail, ShieldCheck } from 'lucide-react';
+import { Eye, EyeOff, ArrowRight, Lock, Mail, ShieldCheck, CheckCircle2, AlertCircle, X } from 'lucide-react';
 
 function LoginForm() {
   const router = useRouter();
@@ -21,11 +20,14 @@ function LoginForm() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setFeedback(null);
+
     if (!formData.email || !formData.password) {
-      toast.error('Vui lòng điền đầy đủ email và mật khẩu');
+      setFeedback({ type: 'error', message: 'Vui lòng điền đầy đủ email và mật khẩu' });
       return;
     }
 
@@ -37,17 +39,33 @@ function LoginForm() {
       });
 
       dispatch(setCredentials(data));
-      toast.success(`Chào mừng ${data.user.fullName || 'bạn'} đã quay trở lại!`);
-      
+      const isAdmin = isAdminRole(data.user.role);
+      const customRedirect = searchParams.get('redirect');
+
+      let targetPath = '/';
+      if (isAdmin) {
+        targetPath = customRedirect && customRedirect !== '/' ? customRedirect : '/admin';
+        setFeedback({
+          type: 'success',
+          message: `Chào mừng Quản trị viên ${data.user.fullName || ''}! Đang chuyển vào trang Quản trị...`,
+        });
+      } else {
+        targetPath = customRedirect && !customRedirect.startsWith('/admin') ? customRedirect : '/';
+        setFeedback({
+          type: 'success',
+          message: `Đăng nhập thành công! Chào mừng ${data.user.fullName || 'bạn'} quay trở lại.`,
+        });
+      }
+
       setTimeout(() => {
-        router.push(redirectUrl);
-      }, 300);
+        router.push(targetPath);
+      }, 450);
     } catch (err: unknown) {
       const errorMsg =
         (err as { response?: { data?: { message?: string; error?: string } } })?.response?.data?.message ||
         (err as { response?: { data?: { message?: string; error?: string } } })?.response?.data?.error ||
         'Email hoặc mật khẩu không chính xác!';
-      toast.error(errorMsg);
+      setFeedback({ type: 'error', message: errorMsg });
     } finally {
       setLoading(false);
     }
@@ -73,6 +91,35 @@ function LoginForm() {
             Truy cập tài khoản để theo dõi đơn hàng và danh sách yêu thích
           </p>
         </div>
+
+        {/* Inline Status Banner (Does not block navbar buttons) */}
+        {feedback && (
+          <div
+            role="status"
+            className={`mt-5 p-3 rounded-xs border text-xs font-medium flex items-start justify-between gap-2.5 animate-in fade-in duration-150 ${
+              feedback.type === 'success'
+                ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+                : 'bg-red-50 border-red-200 text-red-700'
+            }`}
+          >
+            <div className="flex items-start gap-2">
+              {feedback.type === 'success' ? (
+                <CheckCircle2 size={15} className="text-emerald-600 shrink-0 mt-0.5" />
+              ) : (
+                <AlertCircle size={15} className="text-red-600 shrink-0 mt-0.5" />
+              )}
+              <span className="leading-relaxed">{feedback.message}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setFeedback(null)}
+              className="text-current opacity-60 hover:opacity-100 transition-opacity shrink-0"
+              aria-label="Đóng thông báo"
+            >
+              <X size={14} />
+            </button>
+          </div>
+        )}
 
         {/* Login Form */}
         <form className="mt-6 space-y-4" onSubmit={handleSubmit}>

@@ -60,7 +60,7 @@ public class SecurityConfig {
                                 "/api/v1/products/search/**")
                         .permitAll()
                         .requestMatchers("/api/admin/**", "/api/v1/admin/**")
-                        .permitAll()
+                        .hasAuthority("ROLE_ADMIN")
                         .anyRequest().authenticated())
                 .formLogin(form -> form.disable())
                 .httpBasic(basic -> basic.disable())
