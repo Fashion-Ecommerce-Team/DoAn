@@ -24,6 +24,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title=settings.PROJECT_NAME,
     description="Multimodal Fashion Search & Policy RAG Embedding Service",
+    description="Multimodal Fashion Search & Embedding Engine using Fashion-CLIP",
     version=settings.VERSION,
     lifespan=lifespan,
 )
@@ -51,6 +52,8 @@ app.include_router(bkai_router, prefix="/api/v1/bkai", tags=["BKAI Policy Embedd
 app.include_router(bkai_router, prefix="/api/v1/embedding", tags=["Text Embedding"])
 
 # 5. Health Check Endpoints
+
+# 4. Health Check Endpoints
 @app.get("/health", tags=["Health"])
 def health_check():
     model = get_fashion_clip_model()
@@ -62,6 +65,8 @@ def health_check():
         "fashionclip_dimension": settings.VECTOR_DIMENSION,
         "bkai_model": settings.BKAI_MODEL_NAME,
         "bkai_dimension": settings.BKAI_VECTOR_DIMENSION,
+        "model": model.model_name,
+        "dimension": settings.VECTOR_DIMENSION,
         "device": model.device,
         "indexed_products": len(model.product_vectors),
     }
@@ -72,4 +77,5 @@ def root():
         "message": f"{settings.PROJECT_NAME} đang hoạt động!",
         "docs_url": "/docs",
         "modules": ["fashionclip", "bkai-bi-encoder"],
+        "module": "fashionclip",
     }

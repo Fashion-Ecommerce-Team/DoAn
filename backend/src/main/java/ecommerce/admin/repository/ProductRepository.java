@@ -14,10 +14,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.query.Param;
 
-@Repository
+@Repository("adminProductRepository")
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    @Query("SELECT p FROM Product p WHERE " +
+    @Query("SELECT p FROM AdminProduct p WHERE " +
            "(:keyword IS NULL OR :keyword = '' OR LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))) AND " +
            "(:categoryId IS NULL OR p.categoryId = :categoryId) AND " +
            "(:gender IS NULL OR :gender = '' OR UPPER(p.gender) = UPPER(:gender)) AND " +
@@ -48,5 +48,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<Product> findProductsWithoutEmbedding(@Param("keyword") String keyword, Pageable pageable);
 
     @Query("SELECT p.id FROM Product p WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :kw, '%'))")
+    @Query("SELECT p.id FROM AdminProduct p WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :kw, '%'))")
     List<Long> findIdsByKeyword(@Param("kw") String keyword);
 }

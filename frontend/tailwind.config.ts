@@ -50,6 +50,9 @@ const config: Config = {
           foreground: "#0f172a",
         },
       },
+      fontFamily: {
+        sans: ["var(--font-montserrat)", "system-ui", "-apple-system", "sans-serif"],
+      },
     },
   },
   plugins: [],

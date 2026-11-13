@@ -3,6 +3,12 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ShieldCheck, LogOut, X, Sparkles } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { ShieldCheck, LogOut, Store, X } from 'lucide-react';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '@/store';
+import { logout } from '@/features/auth/authSlice';
+import { toast } from 'sonner';
 import { ADMIN_NAVIGATION } from '../../constants/adminNavigation';
 import { cn } from '@/utils';
 
@@ -13,6 +19,15 @@ interface AdminSidebarProps {
 
 export default function AdminSidebar({ mobileOpen = false, onCloseMobile }: AdminSidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const dispatch = useDispatch();
+  const { user } = useSelector((state: RootState) => state.auth);
+
+  const handleAdminLogout = () => {
+    dispatch(logout());
+    toast.success('Đã đăng xuất khỏi trang Quản trị');
+    router.push('/login');
+  };
 
   const sidebarContent = (
     <div className="flex flex-col h-full bg-white text-slate-700 border-r border-slate-200/80 shadow-[2px_0_12px_rgba(0,0,0,0.02)] select-none">
@@ -108,9 +123,24 @@ export default function AdminSidebar({ mobileOpen = false, onCloseMobile }: Admi
             href="/"
             title="Quay lại Shop"
             className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors flex-shrink-0"
+            <p className="text-xs font-bold text-white truncate">{user?.fullName || 'Administrator'}</p>
+            <p className="text-[11px] text-slate-400 truncate">{user?.email || 'admin@system.local'}</p>
+          </div>
+          <Link
+            href="/"
+            title="Về giao diện Cửa hàng"
+            className="p-1.5 text-slate-400 hover:text-blue-400 hover:bg-slate-800 rounded-md transition-colors"
+          >
+            <Store className="w-4 h-4" />
+          </Link>
+          <button
+            type="button"
+            onClick={handleAdminLogout}
+            title="Đăng xuất"
+            className="p-1.5 text-slate-400 hover:text-red-400 hover:bg-slate-800 rounded-md transition-colors"
           >
             <LogOut className="w-4 h-4" />
-          </Link>
+          </button>
         </div>
       </div>
     </div>

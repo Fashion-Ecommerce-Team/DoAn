@@ -97,6 +97,7 @@ class FashionClipModel:
         if target_url.startswith("http://assets.myntassets.com"):
             target_url = target_url.replace("http://assets.myntassets.com", "https://assets.myntassets.com")
         resp = requests.get(target_url, headers=headers, timeout=30)
+        resp = requests.get(url, headers=headers, timeout=8)
         resp.raise_for_status()
         return Image.open(io.BytesIO(resp.content))
 
