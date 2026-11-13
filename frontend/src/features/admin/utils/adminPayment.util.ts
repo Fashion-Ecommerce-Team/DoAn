@@ -8,16 +8,20 @@ export const PAYMENT_STATUS_LABELS: Record<string, string> = {
 
 export const PAYMENT_METHOD_LABELS: Record<string, string> = {
   COD: 'Thanh toán khi nhận hàng (COD)',
-  BANK_TRANSFER: 'Chuyển khoản / QR',
-  VNPAY: 'VNPay',
-  MOMO: 'MoMo',
+  QR: 'Chuyển khoản / Quét mã QR',
+  VNPAY: 'Cổng VNPAY',
+  MOMO: 'Ví MoMo',
 };
 
 export const getPaymentStatusLabel = (status?: string) =>
   (status && PAYMENT_STATUS_LABELS[status]) || status || '---';
 
-export const getPaymentMethodLabel = (method?: string) =>
-  (method && PAYMENT_METHOD_LABELS[method]) || method || '---';
+export const getPaymentMethodLabel = (method?: string) => {
+  if (!method) return '---';
+  const m = method.toUpperCase();
+  if (m === 'QR' || m === 'BANK_TRANSFER') return 'Chuyển khoản QR';
+  return PAYMENT_METHOD_LABELS[m] || method;
+};
 
 export const formatCurrency = (amount?: number) => {
   if (amount === undefined || amount === null) return '0 ₫';

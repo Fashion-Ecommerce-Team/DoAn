@@ -17,6 +17,10 @@ class Settings(BaseSettings):
     VECTOR_DIMENSION: int = 512
     CACHE_FILE: str = os.path.join(os.path.dirname(__file__), "..", "..", "catalog_embeddings.npz")
     
+    # BKAI Vietnamese Bi-Encoder config (Policy RAG)
+    BKAI_MODEL_NAME: str = "bkai-foundation-models/vietnamese-bi-encoder"
+    BKAI_VECTOR_DIMENSION: int = 768
+    
     # Device: auto select cuda if available
     DEVICE: str = "cuda" if os.environ.get("CUDA_VISIBLE_DEVICES") else "auto"
 

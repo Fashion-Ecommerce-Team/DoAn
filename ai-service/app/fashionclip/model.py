@@ -93,6 +93,10 @@ class FashionClipModel:
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
         }
+        target_url = url.strip()
+        if target_url.startswith("http://assets.myntassets.com"):
+            target_url = target_url.replace("http://assets.myntassets.com", "https://assets.myntassets.com")
+        resp = requests.get(target_url, headers=headers, timeout=30)
         resp = requests.get(url, headers=headers, timeout=8)
         resp.raise_for_status()
         return Image.open(io.BytesIO(resp.content))

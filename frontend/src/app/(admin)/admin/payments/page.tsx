@@ -1,12 +1,11 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, RotateCcw } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@admin/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@admin/components/ui/table';
 import { Button } from '@admin/components/ui/button';
-import { Input } from '@admin/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@admin/components/ui/select';
 import { getPayments, updatePaymentStatus } from '@admin/services';
 import { PaymentResponse } from '@admin/types';
@@ -20,6 +19,9 @@ import {
   getApiErrorMessage,
 } from '@/features/admin/utils/adminPayment.util';
 import { toast } from 'sonner';
+import AdminSearchBar from '@/features/admin/components/common/AdminSearchBar';
+import AdminPageHeader from '@/features/admin/components/common/AdminPageHeader';
+import { AdminViewButton, AdminDeleteButton } from '@/features/admin/components/common/AdminTableActions';
 
 export default function PaymentPage() {
   const [payments, setPayments] = useState<PaymentResponse[]>([]);
@@ -45,20 +47,10 @@ export default function PaymentPage() {
     }
   };
 
-  // Tải dữ liệu ngay khi chuyển trang, đổi trạng thái hoặc phương thức
   useEffect(() => {
     loadPayments();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status, method, page]);
-
-  // Chỉ debounce khi người dùng gõ tìm kiếm để không spam API
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      loadPayments();
-    }, 300);
-    return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search]);
+  }, [status, method, page, search]);
 
   const handleUpdateStatus = async (id: number, newStatus: string, confirmText?: string) => {
     if (confirmText && !confirm(confirmText)) return;
@@ -71,43 +63,38 @@ export default function PaymentPage() {
     }
   };
 
-  const statusFilters = [
-    { label: 'Tất cả', value: 'ALL' },
-    ...Object.entries(PAYMENT_STATUS_LABELS).map(([value, label]) => ({ label, value })),
-  ];
-
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold tracking-tight text-slate-900">Quản lý Thanh toán</h2>
-      </div>
-
-      {/* Bộ lọc trạng thái dạng Tab/Pills nhanh */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1">
-        {statusFilters.map((tab) => (
-          <button
-            key={tab.value}
-            onClick={() => { setStatus(tab.value); setPage(0); }}
-            className={`px-3 py-1.5 rounded-full text-xs font-bold transition-colors whitespace-nowrap ${status === tab.value
-              ? 'bg-blue-600 text-white shadow-sm'
-              : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
-              }`}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      <AdminPageHeader
+        title="Giao dịch Thanh toán"
+        description="Theo dõi chi tiết các giao dịch thanh toán qua cổng và COD"
+        badge={totalElements}
+      />
 
       <Card>
-        <CardHeader className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 py-4">
-          <Input
+        <CardHeader className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 py-4">
+          <AdminSearchBar
             placeholder="Tìm theo Mã đơn hàng, Mã giao dịch..."
-            className="max-w-md border-slate-300 text-slate-900 bg-slate-50 focus:bg-white text-sm"
-            value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(0); }}
+            defaultValue={search}
+            onSearch={(val) => {
+              setSearch(val);
+              setPage(0);
+            }}
+            className="w-full sm:max-w-md"
           />
+          <Select value={status} onValueChange={(v) => { setStatus(v); setPage(0); }}>
+            <SelectTrigger className="w-full sm:w-[180px] border-slate-200 rounded-xl text-xs font-semibold h-9">
+              <SelectValue placeholder="Trạng thái" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">Tất cả trạng thái</SelectItem>
+              {Object.entries(PAYMENT_STATUS_LABELS).map(([value, label]) => (
+                <SelectItem key={value} value={value}>{label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <Select value={method} onValueChange={(v) => { setMethod(v); setPage(0); }}>
-            <SelectTrigger className="w-[260px] border-slate-300 text-xs font-semibold">
+            <SelectTrigger className="w-full sm:w-[220px] border-slate-200 rounded-xl text-xs font-semibold h-9">
               <SelectValue placeholder="Lọc theo phương thức" />
             </SelectTrigger>
             <SelectContent>
@@ -117,58 +104,69 @@ export default function PaymentPage() {
               ))}
             </SelectContent>
           </Select>
+
+          {(status !== 'ALL' || method !== 'ALL' || search) && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setSearch('');
+                setStatus('ALL');
+                setMethod('ALL');
+                setPage(0);
+              }}
+              className="h-9 px-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 border-slate-200"
+              title="Đặt lại bộ lọc"
+            >
+              <RotateCcw className="w-3.5 h-3.5 mr-1" />
+              Đặt lại
+            </Button>
+          )}
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead className="w-20 font-bold text-slate-900">Mã TT</TableHead>
-                <TableHead className="font-bold text-slate-900">Đơn hàng</TableHead>
-                <TableHead className="font-bold text-slate-900">Phương thức</TableHead>
-                <TableHead className="font-bold text-slate-900">Số tiền</TableHead>
-                <TableHead className="font-bold text-slate-900">Mã giao dịch</TableHead>
-                <TableHead className="font-bold text-slate-900">Trạng thái</TableHead>
-                <TableHead className="font-bold text-slate-900">Ngày tạo</TableHead>
-                <TableHead className="font-bold text-slate-900">Cập nhật</TableHead>
-                <TableHead className="text-center font-bold text-slate-900">Hành động</TableHead>
+              <TableRow className="bg-slate-50/80 hover:bg-slate-50/80">
+                <TableHead className="w-20 font-semibold text-slate-700 text-xs py-3.5">Mã TT</TableHead>
+                <TableHead className="font-semibold text-slate-700 text-xs py-3.5">Đơn hàng</TableHead>
+                <TableHead className="font-semibold text-slate-700 text-xs py-3.5">Phương thức</TableHead>
+                <TableHead className="font-semibold text-slate-700 text-xs py-3.5">Số tiền</TableHead>
+                <TableHead className="font-semibold text-slate-700 text-xs py-3.5">Mã giao dịch</TableHead>
+                <TableHead className="font-semibold text-slate-700 text-xs py-3.5">Trạng thái</TableHead>
+                <TableHead className="font-semibold text-slate-700 text-xs py-3.5">Ngày tạo</TableHead>
+                <TableHead className="font-semibold text-slate-700 text-xs py-3.5">Cập nhật</TableHead>
+                <TableHead className="text-center font-semibold text-slate-700 text-xs py-3.5">Hành động</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={9} className="text-center py-8 font-bold text-slate-700">Đang tải...</TableCell>
+                  <TableCell colSpan={9} className="text-center py-8 font-semibold text-slate-600">Đang tải...</TableCell>
                 </TableRow>
               ) : payments.length > 0 ? (
                 payments.map((p) => (
-                  <TableRow key={p.id} className="hover:bg-slate-50">
-                    <TableCell className="font-bold text-slate-900">{p.id}</TableCell>
+                  <TableRow key={p.id} className="hover:bg-slate-50/80">
+                    <TableCell className="font-mono text-xs font-bold text-slate-700">#{p.id}</TableCell>
                     <TableCell>
-                      <Link href={`/admin/orders/${p.orderId}`} className="font-bold text-blue-700 hover:underline">
-                        Đơn {p.orderId}
+                      <Link href={`/admin/orders/${p.orderId}`} className="font-semibold text-xs text-[#0099FF] hover:text-[#0077cc] hover:underline">
+                        Đơn #{p.orderId}
                       </Link>
                       {p.receiverName && (
-                        <div className="text-xs text-slate-500 font-medium">{p.receiverName}</div>
+                        <div className="text-[11px] text-slate-500 font-medium">{p.receiverName}</div>
                       )}
                     </TableCell>
-                    <TableCell className="text-sm font-medium text-slate-800">{getPaymentMethodLabel(p.paymentMethod)}</TableCell>
-                    <TableCell className="font-bold text-slate-900 whitespace-nowrap">{formatCurrency(p.amount)}</TableCell>
-                    <TableCell className="font-mono text-xs text-slate-700">{p.transactionId || '---'}</TableCell>
+                    <TableCell className="text-xs font-semibold text-slate-800">{getPaymentMethodLabel(p.paymentMethod)}</TableCell>
+                    <TableCell className="font-bold text-xs text-slate-900 whitespace-nowrap">{formatCurrency(p.amount)}</TableCell>
+                    <TableCell className="font-mono text-[11px] text-slate-600">{p.transactionId || '---'}</TableCell>
                     <TableCell><PaymentStatusBadge status={p.paymentStatus} /></TableCell>
-                    <TableCell className="text-slate-500 text-sm whitespace-nowrap">
+                    <TableCell className="text-slate-500 text-xs whitespace-nowrap">
                       {p.createdAt ? new Date(p.createdAt).toLocaleDateString('vi-VN') : '---'}
                     </TableCell>
-                    <TableCell className="text-slate-500 text-sm whitespace-nowrap">
+                    <TableCell className="text-slate-500 text-xs whitespace-nowrap">
                       {p.updatedAt ? new Date(p.updatedAt).toLocaleDateString('vi-VN') : '---'}
                     </TableCell>
-                    <TableCell className="text-center space-x-2 whitespace-nowrap">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        asChild
-                        className="font-bold border-blue-200 hover:bg-blue-50 text-blue-700 bg-white"
-                      >
-                        <Link href={`/admin/payments/${p.id}`}>Xem chi tiết</Link>
-                      </Button>
+                    <TableCell className="text-center space-x-1.5 whitespace-nowrap py-3">
+                      <AdminViewButton href={`/admin/payments/${p.id}`} />
 
                       {p.paymentStatus === 'PENDING' && (
                         <>
@@ -176,18 +174,14 @@ export default function PaymentPage() {
                             variant="outline"
                             size="sm"
                             onClick={() => handleUpdateStatus(p.id, 'PAID')}
-                            className="font-bold border-green-200 hover:bg-green-50 text-green-700 bg-white"
+                            className="h-8 px-2.5 rounded-lg text-xs font-semibold border-emerald-200 text-emerald-700 bg-emerald-50/70 hover:bg-emerald-100 hover:text-emerald-800 shadow-xs"
                           >
-                            Xác nhận đã thanh toán
+                            Xác nhận TT
                           </Button>
-                          <Button
-                            variant="destructive"
-                            size="sm"
+                          <AdminDeleteButton
+                            label="Thất bại"
                             onClick={() => handleUpdateStatus(p.id, 'FAILED', `Đánh dấu thanh toán #${p.id} là thất bại?`)}
-                            className="font-bold bg-red-600 hover:bg-red-700 text-white"
-                          >
-                            Thất bại
-                          </Button>
+                          />
                         </>
                       )}
 
@@ -196,7 +190,7 @@ export default function PaymentPage() {
                           variant="outline"
                           size="sm"
                           onClick={() => handleUpdateStatus(p.id, 'REFUNDED', `Xác nhận hoàn tiền cho thanh toán #${p.id}?`)}
-                          className="font-bold border-indigo-200 hover:bg-indigo-50 text-indigo-700 bg-white"
+                          className="h-8 px-2.5 rounded-lg text-xs font-semibold border-amber-200 text-amber-700 bg-amber-50/70 hover:bg-amber-100 hover:text-amber-800 shadow-xs"
                         >
                           Hoàn tiền
                         </Button>

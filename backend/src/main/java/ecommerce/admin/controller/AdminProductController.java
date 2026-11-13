@@ -19,9 +19,14 @@ public class AdminProductController {
     public ApiResponse<PageResponse<ProductResponse>> getAllProducts(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) String gender,
+            @RequestParam(required = false) ecommerce.common.constant.EntityStatus status,
+            @RequestParam(required = false) java.math.BigDecimal minPrice,
+            @RequestParam(required = false) java.math.BigDecimal maxPrice,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        return ApiResponse.success("Lấy danh sách sản phẩm thành công", productService.getAllProducts(keyword, categoryId, page, size));
+        return ApiResponse.success("Lấy danh sách sản phẩm thành công", 
+                productService.getAllProducts(keyword, categoryId, gender, status, minPrice, maxPrice, page, size));
     }
 
     @GetMapping("/{id}")

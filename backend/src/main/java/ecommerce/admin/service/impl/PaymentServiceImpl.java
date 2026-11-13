@@ -46,7 +46,15 @@ public class PaymentServiceImpl implements PaymentService {
             spec = spec.and((root, query, cb) -> cb.equal(root.get("paymentStatus"), status.trim().toUpperCase()));
         }
         if (method != null && !method.trim().isEmpty() && !method.equalsIgnoreCase("ALL")) {
-            spec = spec.and((root, query, cb) -> cb.equal(root.get("paymentMethod"), method.trim().toUpperCase()));
+            String m = method.trim().toUpperCase();
+            if (m.equals("QR") || m.equals("BANK_TRANSFER")) {
+                spec = spec.and((root, query, cb) -> cb.or(
+                    cb.equal(cb.upper(root.get("paymentMethod")), "QR"),
+                    cb.equal(cb.upper(root.get("paymentMethod")), "BANK_TRANSFER")
+                ));
+            } else {
+                spec = spec.and((root, query, cb) -> cb.equal(cb.upper(root.get("paymentMethod")), m));
+            }
         }
         if (orderId != null) {
             spec = spec.and((root, query, cb) -> cb.equal(root.get("orderId"), orderId));

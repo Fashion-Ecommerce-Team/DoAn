@@ -1,5 +1,6 @@
-﻿'use client';
+'use client';
 
+import { GENDER_OPTIONS, normalizeGender } from '@admin/utils/adminProduct.util';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -9,7 +10,7 @@ import { Input } from '@admin/components/ui/input';
 import { Label } from '@admin/components/ui/label';
 import { Textarea } from '@admin/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@admin/components/ui/select';
-import { getProductById, updateProduct, getCategories, getBrands } from '@admin/services';
+import { getProductById, updateProduct, getCategories, getAllBrands } from '@admin/services';
 import { CategoryResponse, BrandResponse, ProductRequest } from '@admin/types';
 import { toast } from 'sonner';
 import { ArrowLeft, Save } from 'lucide-react';
@@ -30,7 +31,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
     description: '',
     basePrice: '',
     discountPrice: '',
-    gender: 'MALE',
+    gender: 'UNISEX',
     tags: '',
     status: 'ACTIVE'
   });
@@ -41,11 +42,11 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
         const [prodData, catsData, brandsData] = await Promise.all([
           getProductById(Number(params.id)),
           getCategories(0, 100),
-          getBrands(0, 100)
+          getAllBrands()
         ]);
 
         setCategories(catsData.content || []);
-        setBrands(brandsData.content || []);
+        setBrands(brandsData || []);
 
         setFormData({
           name: prodData.name || '',
@@ -55,7 +56,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
           description: prodData.description || '',
           basePrice: prodData.basePrice?.toString() || '',
           discountPrice: prodData.discountPrice ? prodData.discountPrice.toString() : '',
-          gender: prodData.gender || 'MALE',
+          gender: normalizeGender(prodData.gender) || 'UNISEX',
           tags: prodData.tags || '',
           status: prodData.status || 'ACTIVE'
         });
@@ -184,9 +185,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                 <Select value={formData.gender} onValueChange={(val) => setFormData({ ...formData, gender: val })}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="MALE">Nam</SelectItem>
-                    <SelectItem value="FEMALE">Nữ</SelectItem>
-                    <SelectItem value="UNISEX">Nam và Nữ (Unisex)</SelectItem>
+                    {GENDER_OPTIONS.map((o) => (<SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>))}
                   </SelectContent>
                 </Select>
               </div>
