@@ -1,3 +1,4 @@
+
 package ecommerce.config;
 
 import ecommerce.security.JwtAuthenticationFilter;
@@ -31,17 +32,28 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration authConfig
+    ) throws Exception {
         return authConfig.getAuthenticationManager();
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http
+    ) throws Exception {
+
         http
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(
+                                SessionCreationPolicy.STATELESS
+                        )
+                )
                 .authorizeHttpRequests(auth -> auth
+
+                        // Public APIs
                         .requestMatchers(
                                 "/api/v1/auth/**",
                                 "/api/test",
@@ -49,23 +61,43 @@ public class SecurityConfig {
                                 "/swagger-ui.html",
                                 "/swagger-resources/**",
                                 "/webjars/**",
-                                "/v3/api-docs/**")
-                        .permitAll()
-                        .requestMatchers(HttpMethod.GET,
+                                "/v3/api-docs/**"
+                        ).permitAll()
+
+                        // Public product information
+                        .requestMatchers(
+                                HttpMethod.GET,
                                 "/api/v1/products/**",
                                 "/api/v1/categories/**",
-                                "/api/v1/brands/**")
-                        .permitAll()
-                        .requestMatchers(HttpMethod.POST,
-                                "/api/v1/products/search/**")
-                        .permitAll()
-                        .requestMatchers("/api/admin/**", "/api/v1/admin/**")
-                        .permitAll()
-                            .requestMatchers("/internal/ai/rag/products").permitAll()
-                        .anyRequest().authenticated())
+                                "/api/v1/brands/**"
+                        ).permitAll()
+
+                        // Product search
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/v1/products/search/**"
+                        ).permitAll()
+
+                        // Admin APIs
+                        .requestMatchers(
+                                "/api/admin/**",
+                                "/api/v1/admin/**"
+                        ).hasAuthority("ROLE_ADMIN")
+
+                        // Internal RAG endpoint:
+                        // Requires authentication by default.
+                        // A separate service-to-service security
+                        // mechanism should be added if needed.
+
+                        // All other APIs require authentication
+                        .anyRequest().authenticated()
+                )
                 .formLogin(form -> form.disable())
                 .httpBasic(basic -> basic.disable())
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(
+                        jwtAuthenticationFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                );
 
         return http.build();
     }

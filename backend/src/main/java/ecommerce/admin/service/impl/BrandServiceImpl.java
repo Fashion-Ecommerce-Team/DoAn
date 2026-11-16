@@ -29,7 +29,10 @@ public class BrandServiceImpl implements BrandService {
     @Autowired
     private CloudinaryService cloudinaryService;
 
-    @Override
+    @Autowired
+    private ecommerce.admin.service.EmbeddingSyncService embeddingSyncService;
+
+        @Override
     public PageResponse<BrandResponse> getList(String search, String status, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Specification<Brand> spec = Specification.where(null);
@@ -76,7 +79,9 @@ public class BrandServiceImpl implements BrandService {
             entity.setName(formatName(request.getName().trim()));
         }
         entity.setSlug(generateSlug(request.getName().trim()));
-        return mapToResponse(repository.save(entity));
+        Brand saved = repository.save(entity);
+        try { embeddingSyncService.refreshPayloadByBrand(id, saved.getName()); } catch (Exception ignored) {}
+        return mapToResponse(saved);
     }
 
     @Override

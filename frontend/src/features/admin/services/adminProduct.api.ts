@@ -4,12 +4,25 @@ import { ProductResponse, ProductRequest, ProductImageResponse } from '../types'
 
 const BASE_URL = '/admin/products';
 
-export const getProducts = async (page: number = 0, size: number = 10, search?: string, categoryId?: string) => {
+export const getProducts = async (
+  page: number = 0,
+  size: number = 10,
+  search?: string,
+  categoryId?: string,
+  gender?: string,
+  status?: string,
+  minPrice?: number,
+  maxPrice?: number
+) => {
   const params = new URLSearchParams();
   params.append('page', page.toString());
   params.append('size', size.toString());
   if (search) params.append('keyword', search);
   if (categoryId && categoryId !== 'all') params.append('categoryId', categoryId);
+  if (gender && gender !== 'ALL') params.append('gender', gender);
+  if (status && status !== 'ALL') params.append('status', status);
+  if (minPrice !== undefined && minPrice !== null && !isNaN(minPrice)) params.append('minPrice', minPrice.toString());
+  if (maxPrice !== undefined && maxPrice !== null && !isNaN(maxPrice)) params.append('maxPrice', maxPrice.toString());
 
   const response = await apiClient.get<ApiResponse<PageResponse<ProductResponse>>>(`${BASE_URL}?${params.toString()}`);
   return response.data.data;

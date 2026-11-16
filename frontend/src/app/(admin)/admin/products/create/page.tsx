@@ -1,5 +1,6 @@
-﻿'use client';
+'use client';
 
+import { GENDER_OPTIONS } from '@admin/utils/adminProduct.util';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
@@ -12,7 +13,7 @@ import { Textarea } from '@admin/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@admin/components/ui/select';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@admin/components/ui/form';
 import { toast } from 'sonner';
-import { createProduct, getCategories, getBrands } from '@admin/services';
+import { createProduct, getCategories, getAllBrands } from '@admin/services';
 import { CategoryResponse, BrandResponse } from '@admin/types';
 
 const formSchema = z.object({
@@ -53,10 +54,10 @@ export default function CreateProductPage() {
       try {
         const [catRes, brandRes] = await Promise.all([
           getCategories(0, 100),
-          getBrands(0, 100),
+          getAllBrands(),
         ]);
         if (catRes?.content) setCategories(catRes.content);
-        if (brandRes?.content) setBrands(brandRes.content);
+        if (brandRes) setBrands(brandRes);
       } catch (error) {
         console.error('Failed to load categories or brands:', error);
       }
@@ -231,9 +232,7 @@ export default function CreateProductPage() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="UNISEX">Unisex (Tất cả)</SelectItem>
-                            <SelectItem value="MALE">Nam (Male)</SelectItem>
-                            <SelectItem value="FEMALE">Nữ (Female)</SelectItem>
+                            {GENDER_OPTIONS.map((o) => (<SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>))}
                           </SelectContent>
                         </Select>
                       </FormItem>

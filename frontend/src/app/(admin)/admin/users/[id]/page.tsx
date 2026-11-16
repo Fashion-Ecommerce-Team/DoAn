@@ -1,8 +1,7 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@admin/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@admin/components/ui/table';
 import { Button } from '@admin/components/ui/button';
@@ -11,6 +10,8 @@ import { MapPin, User, Mail, Phone, Calendar, ArrowLeft, Shield, ShoppingBag } f
 import { getUserById, getUserAddresses, updateUserStatus, getOrders } from '@admin/services';
 import { UserResponse, UserAddressResponse, OrderResponse } from '@admin/types';
 import { toast } from 'sonner';
+import AdminStatusBadge from '@/features/admin/components/common/AdminStatusBadge';
+import { AdminViewButton } from '@/features/admin/components/common/AdminTableActions';
 
 export default function UserDetailPage() {
   const params = useParams();
@@ -100,7 +101,7 @@ export default function UserDetailPage() {
               </div>
               <div>
                 <h3 className="font-bold text-lg text-slate-900">{user.fullName}</h3>
-                <Badge variant={user.roleId === 1 ? 'default' : 'secondary'} className={user.roleId === 1 ? 'bg-indigo-600' : ''}>
+                <Badge variant={user.roleId === 1 ? 'default' : 'secondary'} className={user.roleId === 1 ? 'bg-[#0099FF]' : ''}>
                   {user.roleId === 1 ? 'ADMIN' : 'USER'}
                 </Badge>
               </div>
@@ -121,11 +122,9 @@ export default function UserDetailPage() {
               </div>
               <div className="flex items-center gap-3 text-slate-600">
                 <Shield className="w-4 h-4 text-slate-400" />
-                <span className="font-medium">
+                <span className="font-medium flex items-center gap-2">
                   Trạng thái:
-                  <Badge className="ml-2" variant={user.status === 'ACTIVE' ? 'default' : 'destructive'}>
-                    {user.status === 'ACTIVE' ? 'Hoạt động' : user.status === 'INACTIVE' ? 'Tạm khóa' : 'Đã xóa'}
-                  </Badge>
+                  <AdminStatusBadge status={user.status} type="user" />
                 </span>
               </div>
             </div>
@@ -199,40 +198,24 @@ export default function UserDetailPage() {
                   </TableCell>
                 </TableRow>
               ) : (
-                orders.map((o) => {
-                  const getBadge = (st: string) => {
-                    const baseClass = "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold shadow-sm whitespace-nowrap";
-                    switch (st) {
-                      case 'PENDING': return <span className={`${baseClass} bg-amber-500 text-white`}>Chờ xử lý</span>;
-                      case 'CONFIRMED': return <span className={`${baseClass} bg-indigo-600 text-white`}>Đã xác nhận</span>;
-                      case 'SHIPPED': return <span className={`${baseClass} bg-blue-600 text-white`}>Đang giao</span>;
-                      case 'COMPLETED': return <span className={`${baseClass} bg-green-600 text-white`}>Hoàn thành</span>;
-                      case 'CANCELLED': return <span className={`${baseClass} bg-red-600 text-white`}>Đã hủy</span>;
-                      default: return <span className={`${baseClass} bg-slate-500 text-white`}>{st || '---'}</span>;
-                    }
-                  };
-
-                  return (
-                    <TableRow key={o.id} className="hover:bg-slate-50">
-                      <TableCell className="font-bold text-slate-900">#{o.id}</TableCell>
-                      <TableCell className="text-sm text-slate-600 whitespace-nowrap">
-                        {o.createdAt ? new Date(o.createdAt).toLocaleDateString('vi-VN') : '---'}
-                      </TableCell>
-                      <TableCell className="text-sm text-slate-700 max-w-[220px] truncate" title={o.shippingAddress}>
-                        {o.shippingAddress || '---'}
-                      </TableCell>
-                      <TableCell className="font-bold text-slate-900 whitespace-nowrap">
-                        {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(o.totalAmount || 0)}
-                      </TableCell>
-                      <TableCell>{getBadge(o.status)}</TableCell>
-                      <TableCell className="text-right">
-                        <Button variant="outline" size="sm" asChild className="font-bold border-blue-200 hover:bg-blue-50 text-blue-700">
-                          <Link href={`/admin/orders/${o.id}`}>Xem đơn</Link>
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })
+                orders.map((o) => (
+                  <TableRow key={o.id} className="hover:bg-slate-50/80">
+                    <TableCell className="font-mono text-xs font-bold text-slate-700">#{o.id}</TableCell>
+                    <TableCell className="text-xs text-slate-500 whitespace-nowrap">
+                      {o.createdAt ? new Date(o.createdAt).toLocaleDateString('vi-VN') : '---'}
+                    </TableCell>
+                    <TableCell className="text-xs text-slate-700 max-w-[220px] truncate" title={o.shippingAddress}>
+                      {o.shippingAddress || '---'}
+                    </TableCell>
+                    <TableCell className="font-bold text-xs text-slate-900 whitespace-nowrap">
+                      {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(o.totalAmount || 0)}
+                    </TableCell>
+                    <TableCell><AdminStatusBadge status={o.status} type="order" /></TableCell>
+                    <TableCell className="text-right py-3 whitespace-nowrap">
+                      <AdminViewButton href={`/admin/orders/${o.id}`} />
+                    </TableCell>
+                  </TableRow>
+                ))
               )}
             </TableBody>
           </Table>

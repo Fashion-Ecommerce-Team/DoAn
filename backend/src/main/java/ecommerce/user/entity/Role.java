@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 @Table(name = "roles")
 public class Role {
 
-    @Id 
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -26,23 +26,17 @@ public class Role {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    // ==========================================
-    // CONSTRUCTORS (HÀM KHỞI TẠO)
-    // ==========================================
-
-    // Constructor rỗng: Bắt buộc phải có để JPA/Hibernate có thể khởi tạo đối tượng
     public Role() {
     }
 
-    // Constructor tiện lợi khi tạo nhanh một Role mới
     public Role(String name, String description) {
         this.name = name;
         this.description = description;
         this.status = "ACTIVE";
     }
 
-    // Constructor đầy đủ tham số
-    public Role(Long id, String name, String description, String status, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public Role(Long id, String name, String description, String status, LocalDateTime createdAt,
+            LocalDateTime updatedAt) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -50,10 +44,6 @@ public class Role {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
-
-    // ==========================================
-    // GETTERS VÀ SETTERS (ĐÓNG GÓI DỮ LIỆU)
-    // ==========================================
 
     public Long getId() {
         return id;
@@ -102,10 +92,6 @@ public class Role {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
-
-    // ==========================================
-    // JPA LIFECYCLE CALLBACKS
-    // ==========================================
 
     @PrePersist
     protected void onCreate() {

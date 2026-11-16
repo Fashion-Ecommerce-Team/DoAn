@@ -51,6 +51,8 @@ public class AuthService {
             throw new BadRequestException("Số điện thoại đã được sử dụng, vui lòng chọn số khác!");
         }
         Role customerRole = roleRepository.findByName("ROLE_CUSTOMER")
+                .or(() -> roleRepository.findByName("CUSTOMER"))
+                .or(() -> roleRepository.findByName("USER"))
                 .orElseGet(() -> {
                     Role newRole = new Role("ROLE_CUSTOMER", "Khách hàng mua sắm");
                     return roleRepository.save(newRole);
@@ -80,7 +82,14 @@ public class AuthService {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         User user = userDetails.getUser();
 
-        String roleName = (user.getRole() != null) ? user.getRole().getName() : "ROLE_CUSTOMER";
+        String roleName = "ROLE_CUSTOMER";
+        if (user.getRole() != null) {
+            Long roleId = user.getRole().getId();
+            String rawName = user.getRole().getName() != null ? user.getRole().getName().trim().toUpperCase() : "";
+            if ((roleId != null && roleId == 1L) || rawName.contains("ADMIN")) {
+                roleName = "ROLE_ADMIN";
+            }
+        }
 
         return new AuthResponse(
                 jwt,

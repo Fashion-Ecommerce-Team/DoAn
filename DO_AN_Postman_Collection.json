@@ -1184,6 +1184,12 @@
                                     "value": "ACTIVE",
                                     "disabled": true,
                                     "description": "Lọc theo trạng thái (ACTIVE, INACTIVE)"
+                                },
+                                {
+                                    "key": "position",
+                                    "value": "HERO",
+                                    "disabled": true,
+                                    "description": "Lọc theo vị trí (HERO, SIDEBAR, FOOTER)"
                                 }
                             ]
                         }
@@ -1236,7 +1242,7 @@
                         },
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n  \"title\": \"Khuyến mãi Tết 2026\",\n  \"subtitle\": \"Giảm giá lên đến 50% toàn bộ sản phẩm\",\n  \"imageUrl\": \"https://res.cloudinary.com/demo/image/upload/banner-tet.jpg\",\n  \"cloudinaryPublicId\": \"fashion/banners/banner-tet\",\n  \"linkUrl\": \"/collections/tet-sale\",\n  \"position\": \"HOME_TOP\",\n  \"displayOrder\": 1,\n  \"status\": \"ACTIVE\"\n}",
+                            "raw": "{\n  \"title\": \"Khuyến mãi Tết 2026\",\n  \"subtitle\": \"Giảm giá lên đến 50% toàn bộ sản phẩm\",\n  \"imageUrl\": \"https://res.cloudinary.com/demo/image/upload/banner-tet.jpg\",\n  \"cloudinaryPublicId\": \"fashion/banners/banner-tet\",\n  \"linkUrl\": \"/collections/tet-sale\",\n  \"position\": \"HERO\",\n  \"displayOrder\": 1,\n  \"status\": \"ACTIVE\"\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -1269,7 +1275,7 @@
                         },
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n  \"title\": \"Khuyến mãi Tết 2026 (Cập nhật)\",\n  \"subtitle\": \"Flash Sale đón Tết\",\n  \"imageUrl\": \"https://res.cloudinary.com/demo/image/upload/banner-tet-v2.jpg\",\n  \"cloudinaryPublicId\": \"fashion/banners/banner-tet-v2\",\n  \"linkUrl\": \"/collections/tet-flash-sale\",\n  \"position\": \"HOME_TOP\",\n  \"displayOrder\": 1,\n  \"status\": \"ACTIVE\"\n}",
+                            "raw": "{\n  \"title\": \"Khuyến mãi Tết 2026 (Cập nhật)\",\n  \"subtitle\": \"Flash Sale đón Tết\",\n  \"imageUrl\": \"https://res.cloudinary.com/demo/image/upload/banner-tet-v2.jpg\",\n  \"cloudinaryPublicId\": \"fashion/banners/banner-tet-v2\",\n  \"linkUrl\": \"/collections/tet-flash-sale\",\n  \"position\": \"HERO\",\n  \"displayOrder\": 1,\n  \"status\": \"ACTIVE\"\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -1334,6 +1340,38 @@
                                 "1"
                             ]
                         }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "9.7 Lấy danh sách Banner trang chủ (Public)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{publicUrl}}/banners?position=HERO",
+                            "host": [
+                                "{{publicUrl}}"
+                            ],
+                            "path": [
+                                "banners"
+                            ],
+                            "query": [
+                                {
+                                    "key": "position",
+                                    "value": "HERO",
+                                    "disabled": true,
+                                    "description": "Lọc theo vị trí (HERO, SIDEBAR, FOOTER). Để trống sẽ lấy tất cả banner ACTIVE"
+                                }
+                            ]
+                        },
+                        "description": "API Public cho trang chủ/shop, chỉ lấy các banner ACTIVE sắp xếp theo displayOrder tăng dần."
                     },
                     "response": []
                 }
@@ -1655,10 +1693,133 @@
             ]
         },
         {
-            "name": "12. Users (Người dùng)",
+            "name": "12. Payments (Thanh toán)",
             "item": [
                 {
-                    "name": "12.1 Lấy danh sách User",
+                    "name": "12.1 Lấy danh sách Thanh toán",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/payments?page=0&size=10",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "payments"
+                            ],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "0",
+                                    "description": "Số trang (bắt đầu từ 0)"
+                                },
+                                {
+                                    "key": "size",
+                                    "value": "10",
+                                    "description": "Số lượng mỗi trang"
+                                },
+                                {
+                                    "key": "search",
+                                    "value": "100",
+                                    "disabled": true,
+                                    "description": "Tìm kiếm theo Order ID hoặc Transaction ID"
+                                },
+                                {
+                                    "key": "status",
+                                    "value": "PAID",
+                                    "disabled": true,
+                                    "description": "Lọc theo trạng thái (ALL, PENDING, PAID, FAILED, EXPIRED, REFUNDED)"
+                                },
+                                {
+                                    "key": "method",
+                                    "value": "VNPAY",
+                                    "disabled": true,
+                                    "description": "Lọc theo phương thức (ALL, COD, VNPAY, MOMO, ZALOPAY, BANK_TRANSFER...)"
+                                },
+                                {
+                                    "key": "orderId",
+                                    "value": "1",
+                                    "disabled": true,
+                                    "description": "Lọc theo ID đơn hàng cụ thể"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "12.2 Chi tiết Thanh toán",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/payments/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "payments",
+                                "1"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "12.3 Cập nhật trạng thái Thanh toán",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/payments/1/status",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "payments",
+                                "1",
+                                "status"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"status\": \"PAID\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "description": "Cập nhật trạng thái thanh toán. Trạng thái hỗ trợ: PENDING, PAID, FAILED, EXPIRED, REFUNDED. Chuyển sang PAID sẽ cập nhật paidAt. Chỉ giao dịch đã PAID mới được REFUNDED."
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "13. Users (Người dùng)",
+            "item": [
+                {
+                    "name": "13.1 Lấy danh sách User",
                     "request": {
                         "method": "GET",
                         "header": [
@@ -1705,7 +1866,7 @@
                     "response": []
                 },
                 {
-                    "name": "12.2 Chi tiết User",
+                    "name": "13.2 Chi tiết User",
                     "request": {
                         "method": "GET",
                         "header": [
@@ -1729,7 +1890,7 @@
                     "response": []
                 },
                 {
-                    "name": "12.3 Cập nhật thông tin User",
+                    "name": "13.3 Cập nhật thông tin User",
                     "request": {
                         "method": "PUT",
                         "header": [
@@ -1763,7 +1924,7 @@
                     "response": []
                 },
                 {
-                    "name": "12.4 Cập nhật trạng thái User",
+                    "name": "13.4 Cập nhật trạng thái User",
                     "request": {
                         "method": "PATCH",
                         "header": [
@@ -1797,7 +1958,7 @@
                     "response": []
                 },
                 {
-                    "name": "12.5 Cập nhật quyền (Role) cho User",
+                    "name": "13.5 Cập nhật quyền (Role) cho User",
                     "request": {
                         "method": "PUT",
                         "header": [
@@ -1831,7 +1992,7 @@
                     "response": []
                 },
                 {
-                    "name": "12.6 Lấy danh sách địa chỉ của User",
+                    "name": "13.6 Lấy danh sách địa chỉ của User",
                     "request": {
                         "method": "GET",
                         "header": [
@@ -1856,7 +2017,7 @@
                     "response": []
                 },
                 {
-                    "name": "12.7 Xóa User",
+                    "name": "13.7 Xóa User",
                     "request": {
                         "method": "DELETE",
                         "header": [
@@ -1882,10 +2043,10 @@
             ]
         },
         {
-            "name": "13. Roles (Vai trò)",
+            "name": "14. Roles (Vai trò)",
             "item": [
                 {
-                    "name": "13.1 Lấy danh sách Role",
+                    "name": "14.1 Lấy danh sách Role",
                     "request": {
                         "method": "GET",
                         "header": [
@@ -1916,6 +2077,12 @@
             "value": "http://localhost:8080/api/v1/admin",
             "type": "string",
             "description": "Base URL cho các API Admin (mặc định localhost:8080/api/v1/admin)"
+        },
+        {
+            "key": "publicUrl",
+            "value": "http://localhost:8080/api/v1",
+            "type": "string",
+            "description": "Base URL cho các API Public (mặc định localhost:8080/api/v1)"
         }
     ]
 }

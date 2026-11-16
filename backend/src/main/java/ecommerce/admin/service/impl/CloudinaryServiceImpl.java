@@ -22,8 +22,7 @@ public class CloudinaryServiceImpl implements CloudinaryService {
         try {
             return cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
         } catch (IOException e) {
-            throw new RuntimeException("Ảnh tải lên thất bại");    
-            // throw new RuntimeException("Image upload failed");
+            throw new RuntimeException("Ảnh tải lên thất bại");
         }
     }
 
@@ -35,8 +34,7 @@ public class CloudinaryServiceImpl implements CloudinaryService {
                 Map<String, Object> uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
                 uploadedImages.add(uploadResult);
             } catch (IOException e) {
-                throw new RuntimeException("Ảnh tải lên thất bại");    
-                // throw new RuntimeException("Image upload failed");
+                throw new RuntimeException("Ảnh tải lên thất bại");
             }
         }
         return uploadedImages;
@@ -48,6 +46,30 @@ public class CloudinaryServiceImpl implements CloudinaryService {
             return cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
         } catch (IOException e) {
             throw new RuntimeException("Xóa ảnh thất bại");
+        }
+    }
+
+    @Override
+    public Map<String, Object> uploadFile(MultipartFile file, String folderName) {
+        try {
+            Map<String, Object> params = ObjectUtils.asMap(
+                "folder", (folderName != null && !folderName.isBlank()) ? folderName : "policy_documents",
+                "resource_type", "raw",
+                "use_filename", true,
+                "unique_filename", true
+            );
+            return cloudinary.uploader().upload(file.getBytes(), params);
+        } catch (IOException e) {
+            throw new RuntimeException("Tải file tài liệu lên Cloudinary thất bại: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public Map<String, Object> deleteFile(String publicId) {
+        try {
+            return cloudinary.uploader().destroy(publicId, ObjectUtils.asMap("resource_type", "raw"));
+        } catch (IOException e) {
+            throw new RuntimeException("Xóa file tài liệu trên Cloudinary thất bại: " + e.getMessage());
         }
     }
 

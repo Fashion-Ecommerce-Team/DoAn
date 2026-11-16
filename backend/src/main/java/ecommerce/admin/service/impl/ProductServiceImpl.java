@@ -31,10 +31,32 @@ public class ProductServiceImpl implements ProductService {
     private final ProductVariantRepository productVariantRepository;
 
     @Override
-    public PageResponse<ProductResponse> getAllProducts(String keyword, Long categoryId, int page, int size) {
+    public PageResponse<ProductResponse> getAllProducts(
+            String keyword, 
+            Long categoryId, 
+            String gender, 
+            EntityStatus status, 
+            java.math.BigDecimal minPrice, 
+            java.math.BigDecimal maxPrice, 
+            int page, 
+            int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        Page<Product> productPage = productRepository.findProductsByFilter(keyword, categoryId, pageable);
-        List<ProductResponse> content = productPage.getContent().stream().map(this::mapToResponse).toList();
+        Page<Product> productPage = productRepository.findProductsByFilter(
+                keyword, categoryId, gender, status, minPrice, maxPrice, pageable);
+        List<ProductResponse> content = productPage.getContent().stream().map(p -> {
+            ProductResponse res = mapToResponse(p);
+            List<ProductImageResponse> images = productImageRepository.findByProductId(p.getId()).stream().map(img -> {
+                ProductImageResponse iRes = new ProductImageResponse();
+                iRes.setId(img.getId());
+                iRes.setUrl(img.getImageUrl());
+                iRes.setImageUrl(img.getImageUrl());
+                iRes.setIsPrimary(img.getIsPrimary());
+                iRes.setDisplayOrder(img.getDisplayOrder());
+                return iRes;
+            }).toList();
+            res.setImages(images);
+            return res;
+        }).toList();
 
         return PageResponse.<ProductResponse>builder()
                 .content(content)

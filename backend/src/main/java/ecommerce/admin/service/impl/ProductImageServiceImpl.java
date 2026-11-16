@@ -4,20 +4,22 @@ import ecommerce.admin.dto.request.ProductImageRequest;
 import ecommerce.admin.dto.response.ProductImageResponse;
 import ecommerce.admin.entity.ProductImage;
 import ecommerce.admin.repository.ProductImageRepository;
-import ecommerce.admin.service.ProductImageService;
 import ecommerce.admin.service.CloudinaryService;
+import ecommerce.admin.service.EmbeddingSyncService;
+import ecommerce.admin.service.ProductImageService;
+import ecommerce.common.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ecommerce.common.exception.ResourceNotFoundException;
-import java.time.LocalDateTime;
-import java.util.List;
+
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class ProductImageServiceImpl implements ProductImageService {
     private final ProductImageRepository imageRepository;
     private final CloudinaryService cloudinaryService;
+    private final EmbeddingSyncService embeddingSyncService;
 
     @Override
     public ProductImageResponse addImage(Long productId, ProductImageRequest request) {
@@ -27,9 +29,13 @@ public class ProductImageServiceImpl implements ProductImageService {
                 .cloudinaryPublicId(request.getCloudinaryPublicId())
                 .isPrimary(false)
                 .displayOrder(request.getDisplayOrder() != null ? request.getDisplayOrder() : 0)
-
                 .build();
-        return mapToResponse(imageRepository.save(image));
+        ProductImage saved = imageRepository.save(image);
+
+        // Hook tự động embed ảnh mới thêm
+        embeddingSyncService.syncSingleImage(productId, saved.getId());
+
+        return mapToResponse(saved);
     }
 
     @Override
@@ -47,6 +53,12 @@ public class ProductImageServiceImpl implements ProductImageService {
         }
 
         List<ProductImage> savedImages = imageRepository.saveAll(images);
+
+        // Hook tự động embed các ảnh mới
+        for (ProductImage img : savedImages) {
+            embeddingSyncService.syncSingleImage(productId, img.getId());
+        }
+
         return savedImages.stream().map(this::mapToResponse).toList();
     }
 
@@ -56,9 +68,14 @@ public class ProductImageServiceImpl implements ProductImageService {
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy dữ liệu"));
         image.setImageUrl(request.getImageUrl());
         image.setCloudinaryPublicId(request.getCloudinaryPublicId());
-        if (request.getDisplayOrder() != null)
+        if (request.getDisplayOrder() != null) {
             image.setDisplayOrder(request.getDisplayOrder());
-        return mapToResponse(imageRepository.save(image));
+        }
+        ProductImage saved = imageRepository.save(image);
+        // Cập nhật lại vector nếu URL ảnh thay đổi
+        embeddingSyncService.syncSingleImage(saved.getProductId(), saved.getId());
+
+        return mapToResponse(saved);
     }
 
     @Override
@@ -71,6 +88,9 @@ public class ProductImageServiceImpl implements ProductImageService {
             img.setIsPrimary(img.getId().equals(imageId));
         }
         imageRepository.saveAll(allImages);
+
+        // Cập nhật lại payload is_primary trong Qdrant
+        embeddingSyncService.refreshProductPayload(productId);
     }
 
     @Override
@@ -81,6 +101,9 @@ public class ProductImageServiceImpl implements ProductImageService {
             cloudinaryService.deleteImage(image.getCloudinaryPublicId());
         }
         imageRepository.deleteById(imageId);
+
+        // Hook xóa point khỏi Qdrant và DB log
+        embeddingSyncService.deleteImage(image.getProductId(), imageId);
     }
 
     private ProductImageResponse mapToResponse(ProductImage i) {
@@ -90,6 +113,4 @@ public class ProductImageServiceImpl implements ProductImageService {
         res.setIsPrimary(i.getIsPrimary());
         return res;
     }
-
-    
 }

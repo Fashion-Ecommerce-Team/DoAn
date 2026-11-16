@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader } from '@admin/components/ui/card';
@@ -9,14 +9,20 @@ import { Textarea } from '@admin/components/ui/textarea';
 import { getCategories, deleteCategory, updateCategoryStatus, createCategory, updateCategory } from '@admin/services';
 import { CategoryResponse } from '@admin/types';
 import { toast } from 'sonner';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import AdminSearchBar from '@/features/admin/components/common/AdminSearchBar';
+import AdminPageHeader from '@/features/admin/components/common/AdminPageHeader';
+import AdminStatusBadge from '@/features/admin/components/common/AdminStatusBadge';
+import { AdminToggleButton, AdminEditButton, AdminDeleteButton } from '@/features/admin/components/common/AdminTableActions';
+import { ChevronLeft, ChevronRight, Plus, RotateCcw } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@admin/components/ui/dialog';
 import { Label } from '@admin/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@admin/components/ui/select';
 
 export default function CategoryPage() {
   const [categories, setCategories] = useState<CategoryResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [status, setStatus] = useState('ALL');
   
   // Pagination
   const [page, setPage] = useState(0);
@@ -32,7 +38,8 @@ export default function CategoryPage() {
   const loadCategories = async () => {
     setLoading(true);
     try {
-      const data = await getCategories(page, 10, search || undefined);
+      const statusParam = status === 'ALL' ? undefined : status;
+      const data = await getCategories(page, 10, search || undefined, statusParam);
       setCategories(data.content);
       setTotalPages(data.totalPages);
       setTotalElements(data.totalElements);
@@ -44,11 +51,8 @@ export default function CategoryPage() {
   };
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      loadCategories();
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [search, page]);
+    loadCategories();
+  }, [search, status, page]);
 
   const handleDelete = async (id: number) => {
     if (confirm('Bạn có chắc chắn muốn xóa danh mục này?')) {
@@ -109,78 +113,112 @@ export default function CategoryPage() {
     }
   };
 
-  const getStatusBadge = (status: string) => {
-    const baseClass = "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold shadow-sm";
-    if (status === 'ACTIVE') return <span className={`${baseClass} bg-green-600 text-white`}>Hoạt động</span>;
-    if (status === 'DELETED') return <span className={`${baseClass} bg-red-600 text-white`}>Đã xóa</span>;
-    return <span className={`${baseClass} bg-slate-500 text-white`}>Tạm ẩn</span>;
-  };
-
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold tracking-tight text-slate-900">Quản lý Danh mục</h2>
-        <Button className="font-bold bg-blue-600 hover:bg-blue-700 text-white" onClick={openCreateDialog}>+ Thêm Danh Mục</Button>
-      </div>
+      <AdminPageHeader
+        title="Quản lý Danh mục"
+        description="Quản lý hệ thống phân loại danh mục sản phẩm thời trang"
+        badge={totalElements}
+        action={
+          <Button className="gap-2 shadow-sm font-semibold" onClick={openCreateDialog}>
+            <Plus className="w-4 h-4" />
+            Thêm Danh Mục
+          </Button>
+        }
+      />
 
       <Card>
-        <CardHeader className="flex flex-row items-center gap-4">
-          <Input 
-            placeholder="Tìm kiếm danh mục theo tên..." 
-            className="max-w-md border-slate-300 text-slate-900 bg-slate-50 focus:bg-white" 
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
+        <CardHeader className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 py-4">
+          <AdminSearchBar
+            placeholder="Tìm kiếm danh mục theo tên..."
+            defaultValue={search}
+            onSearch={(val) => {
+              setSearch(val);
               setPage(0);
             }}
+            className="w-full sm:max-w-md"
           />
+          <div className="flex items-center gap-2">
+            <Select value={status} onValueChange={(v) => { setStatus(v); setPage(0); }}>
+              <SelectTrigger className="w-full sm:w-[170px] border-slate-300 text-xs font-semibold">
+                <SelectValue placeholder="Trạng thái" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">Tất cả trạng thái</SelectItem>
+                <SelectItem value="ACTIVE">Đang hoạt động</SelectItem>
+                <SelectItem value="INACTIVE">Tạm ẩn</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {(status !== 'ALL' || search) && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setSearch('');
+                  setStatus('ALL');
+                  setPage(0);
+                }}
+                className="h-9 px-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 border-slate-300"
+                title="Đặt lại bộ lọc"
+              >
+                <RotateCcw className="w-3.5 h-3.5 mr-1" />
+                Đặt lại
+              </Button>
+            )}
+          </div>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead className="w-16">ID</TableHead>
-                <TableHead>Tên danh mục</TableHead>
-                <TableHead>Đường dẫn</TableHead>
-                <TableHead>Mô tả</TableHead>
-                <TableHead>Trạng thái</TableHead>
-                <TableHead>Ngày tạo</TableHead>
-                <TableHead>Cập nhật</TableHead>
-                <TableHead className="text-center">Hành động</TableHead>
+              <TableRow className="bg-slate-50/80 hover:bg-slate-50/80">
+                <TableHead className="w-16 font-semibold text-slate-700 text-xs py-3.5">ID</TableHead>
+                <TableHead className="font-semibold text-slate-700 text-xs py-3.5">Tên danh mục</TableHead>
+                <TableHead className="font-semibold text-slate-700 text-xs py-3.5">Đường dẫn</TableHead>
+                <TableHead className="font-semibold text-slate-700 text-xs py-3.5">Mô tả</TableHead>
+                <TableHead className="font-semibold text-slate-700 text-xs py-3.5">Trạng thái</TableHead>
+                <TableHead className="font-semibold text-slate-700 text-xs py-3.5">Ngày tạo</TableHead>
+                <TableHead className="font-semibold text-slate-700 text-xs py-3.5">Cập nhật</TableHead>
+                <TableHead className="text-center font-semibold text-slate-700 text-xs py-3.5">Hành động</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8 font-bold text-slate-700">Đang tải...</TableCell>
+                  <TableCell colSpan={8} className="text-center py-8 font-semibold text-slate-600">Đang tải...</TableCell>
                 </TableRow>
               ) : categories.length > 0 ? (
                 categories.map((cat) => (
-                  <TableRow key={cat.id}>
-                    <TableCell className="font-bold text-slate-900">{cat.id}</TableCell>
-                    <TableCell className="font-bold text-slate-900">{cat.name}</TableCell>
+                  <TableRow key={cat.id} className="hover:bg-slate-50/80">
+                    <TableCell className="font-mono text-xs font-bold text-slate-700">#{cat.id}</TableCell>
+                    <TableCell className="font-semibold text-slate-900 text-xs">{cat.name}</TableCell>
                     <TableCell>
-                      <span className="inline-block font-mono text-xs text-slate-600 bg-slate-50 px-2 py-0.5 rounded border border-slate-200">
+                      <span className="inline-block font-mono text-[11px] text-slate-600 bg-slate-50 px-2 py-0.5 rounded border border-slate-200">
                         {cat.slug || '---'}
                       </span>
                     </TableCell>
-                    <TableCell className="font-medium text-slate-700">{cat.description || '---'}</TableCell>
-                    <TableCell>{getStatusBadge(cat.status)}</TableCell>
-                    <TableCell className="text-slate-500 text-sm whitespace-nowrap">{cat.createdAt ? new Date(cat.createdAt).toLocaleDateString('vi-VN') : '---'}</TableCell>
-                    <TableCell className="text-slate-500 text-sm whitespace-nowrap">{cat.updatedAt ? new Date(cat.updatedAt).toLocaleDateString('vi-VN') : '---'}</TableCell>
-                    <TableCell className="text-center space-x-2">
-                      <Button variant="outline" size="sm" onClick={() => handleUpdateStatus(cat)} className="font-bold text-blue-600 hover:text-blue-700">
-                        {cat.status === 'ACTIVE' ? 'Tạm ẩn' : 'Mở lại'}
-                      </Button>
-                      <Button variant="outline" size="sm" onClick={() => openEditDialog(cat)} className="font-bold">Sửa</Button>
-                      <Button variant="destructive" size="sm" onClick={() => handleDelete(cat.id)} className="font-bold">Xóa</Button>
+                    <TableCell className="text-xs text-slate-600 font-medium max-w-xs truncate" title={cat.description || ''}>
+                      {cat.description || '---'}
+                    </TableCell>
+                    <TableCell><AdminStatusBadge status={cat.status} type="active" /></TableCell>
+                    <TableCell className="text-slate-500 text-xs whitespace-nowrap">{cat.createdAt ? new Date(cat.createdAt).toLocaleDateString('vi-VN') : '---'}</TableCell>
+                    <TableCell className="text-slate-500 text-xs whitespace-nowrap">{cat.updatedAt ? new Date(cat.updatedAt).toLocaleDateString('vi-VN') : '---'}</TableCell>
+                    <TableCell className="text-center space-x-1.5 whitespace-nowrap py-3">
+                      <AdminToggleButton
+                        active={cat.status === 'ACTIVE'}
+                        onToggle={() => handleUpdateStatus(cat)}
+                        activeLabel="Tạm ẩn"
+                        inactiveLabel="Mở lại"
+                      />
+                      <AdminEditButton onClick={() => openEditDialog(cat)} />
+                      <AdminDeleteButton onClick={() => handleDelete(cat.id)} />
                     </TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8 font-bold text-slate-700">
-                    Không tìm thấy dữ liệu
+                  <TableCell colSpan={8} className="text-center py-8 font-semibold text-slate-500">
+                    Không tìm thấy dữ liệu danh mục
                   </TableCell>
                 </TableRow>
               )}

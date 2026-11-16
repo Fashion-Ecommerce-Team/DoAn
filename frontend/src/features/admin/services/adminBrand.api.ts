@@ -33,3 +33,17 @@ export const updateBrandStatus = async (id: number, status: string) => {
   await apiClient.patch(`${BASE_URL}/${id}/status`, { status });
 };
 
+
+export const getAllBrands = async (): Promise<BrandResponse[]> => {
+  const pageSize = 200;
+  const all: BrandResponse[] = [];
+  let page = 0;
+  let totalPages = 1;
+  while (page < totalPages) {
+    const data = await getBrands(page, pageSize);
+    all.push(...data.content);
+    totalPages = data.totalPages;
+    page += 1;
+  }
+  return all;
+};

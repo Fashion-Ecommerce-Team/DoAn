@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
@@ -32,6 +32,7 @@ import {
 import { getOrderById, updateOrderStatus, cancelOrder } from '@admin/services';
 import { OrderResponse } from '@admin/types';
 import { toast } from 'sonner';
+import AdminStatusBadge from '@/features/admin/components/common/AdminStatusBadge';
 
 export default function OrderDetailPage() {
   const params = useParams();
@@ -119,23 +120,6 @@ export default function OrderDetailPage() {
     }
   };
 
-  const getStatusBadge = (statusStr: string) => {
-    const baseClass = "inline-flex items-center rounded-full px-3 py-1 text-xs font-bold shadow-sm whitespace-nowrap";
-    switch (statusStr) {
-      case 'PENDING':
-        return <span className={`${baseClass} bg-amber-500 text-white`}>Chờ xử lý</span>;
-      case 'CONFIRMED':
-        return <span className={`${baseClass} bg-indigo-600 text-white`}>Đã xác nhận</span>;
-      case 'SHIPPED':
-        return <span className={`${baseClass} bg-blue-600 text-white`}>Đang giao</span>;
-      case 'COMPLETED':
-        return <span className={`${baseClass} bg-green-600 text-white`}>Hoàn thành</span>;
-      case 'CANCELLED':
-        return <span className={`${baseClass} bg-red-600 text-white`}>Đã hủy</span>;
-      default:
-        return <span className={`${baseClass} bg-slate-500 text-white`}>{statusStr || '---'}</span>;
-    }
-  };
 
   const formatCurrency = (amount?: number) => {
     if (amount === undefined || amount === null) return '0 ₫';
@@ -186,8 +170,8 @@ export default function OrderDetailPage() {
           </Button>
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-bold tracking-tight text-slate-900">Chi tiết đơn hàng {order.id}</h1>
-              {getStatusBadge(order.status)}
+              <h1 className="text-2xl font-bold tracking-tight text-slate-900">Chi tiết đơn hàng #{order.id}</h1>
+              <AdminStatusBadge status={order.status} type="order" />
             </div>
             <p className="text-xs text-slate-500 mt-1 flex items-center gap-1.5">
               <Clock className="w-3.5 h-3.5" />
@@ -214,7 +198,7 @@ export default function OrderDetailPage() {
             <Button 
               onClick={() => openStatusModal('CONFIRMED')}
               disabled={actionLoading}
-              className="font-bold bg-indigo-600 hover:bg-indigo-700 text-white"
+              className="font-bold bg-[#0099FF] hover:bg-[#0084e0] text-white shadow-sm shadow-[#0099FF]/20"
             >
               <CheckCircle2 className="w-4 h-4 mr-1.5" />
               Xác nhận đơn
@@ -275,7 +259,7 @@ export default function OrderDetailPage() {
 
         <Card className="border-slate-200 shadow-sm">
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-lg bg-sky-50 text-[#0077cc] flex items-center justify-center">
               <User className="w-5 h-5" />
             </div>
             <div>
@@ -425,19 +409,19 @@ export default function OrderDetailPage() {
           <Card className="border-slate-200 shadow-sm">
             <CardHeader className="border-b bg-slate-50/50 py-3.5">
               <CardTitle className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <History className="w-4 h-4 text-indigo-600" />
+                <History className="w-4 h-4 text-[#0099FF]" />
                 Lịch sử xử lý đơn hàng
               </CardTitle>
               <CardDescription>Theo dõi toàn bộ các lần thay đổi trạng thái và ghi chú của người phụ trách</CardDescription>
             </CardHeader>
             <CardContent className="p-4">
               {order.statusHistory && order.statusHistory.length > 0 ? (
-                <div className="relative border-l-2 border-indigo-200 ml-3.5 pl-6 space-y-6">
+                <div className="relative border-l-2 border-sky-200 ml-3.5 pl-6 space-y-6">
                   {order.statusHistory.map((item, idx) => (
                     <div key={item.id || idx} className="relative group">
                       {/* Vòng tròn mốc thời gian */}
-                      <div className="absolute -left-[31px] top-0 w-4 h-4 rounded-full bg-white border-2 border-indigo-600 shadow-sm flex items-center justify-center">
-                        <div className="w-1.5 h-1.5 rounded-full bg-indigo-600"></div>
+                      <div className="absolute -left-[31px] top-0 w-4 h-4 rounded-full bg-white border-2 border-[#0099FF] shadow-sm flex items-center justify-center">
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#0099FF]"></div>
                       </div>
 
                       <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm space-y-1.5">
@@ -449,7 +433,7 @@ export default function OrderDetailPage() {
                                 <ArrowRight className="w-3 h-3 text-slate-400" />
                               </>
                             )}
-                            <span className="font-bold text-indigo-700">{getStatusLabel(item.newStatus)}</span>
+                            <span className="font-bold text-[#0077cc]">{getStatusLabel(item.newStatus)}</span>
                           </div>
                           <span className="text-xs text-slate-500 font-medium flex items-center gap-1">
                             <Clock className="w-3 h-3" />

@@ -24,7 +24,10 @@ public class CategoryServiceImpl implements CategoryService {
     @Autowired
     private CategoryRepository repository;
 
-    @Override
+    @Autowired
+    private ecommerce.admin.service.EmbeddingSyncService embeddingSyncService;
+
+        @Override
     public PageResponse<CategoryResponse> getList(String search, String status, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Specification<Category> spec = Specification.where(null);
@@ -72,7 +75,9 @@ public class CategoryServiceImpl implements CategoryService {
         }
         entity.setSlug(generateSlug(request.getName().trim()));
         entity.setUpdatedAt(java.time.LocalDateTime.now());
-        return mapToResponse(repository.save(entity));
+        Category saved = repository.save(entity);
+        try { embeddingSyncService.refreshPayloadByCategory(id, saved.getName()); } catch (Exception ignored) {}
+        return mapToResponse(saved);
     }
 
     @Override

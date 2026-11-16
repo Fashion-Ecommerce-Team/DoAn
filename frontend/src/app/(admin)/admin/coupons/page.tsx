@@ -1,7 +1,7 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useState } from 'react';
-import { ChevronLeft, ChevronRight, Plus, Tag, Calendar, Eye } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Tag, Calendar } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@admin/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@admin/components/ui/table';
 import { Button } from '@admin/components/ui/button';
@@ -13,6 +13,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { getCoupons, getCouponById, createCoupon, updateCoupon, updateCouponStatus, deleteCoupon } from '@admin/services';
 import { CouponResponse, CouponRequest } from '@admin/types';
 import { toast } from 'sonner';
+import AdminSearchBar from '@/features/admin/components/common/AdminSearchBar';
+import AdminPageHeader from '@/features/admin/components/common/AdminPageHeader';
+import AdminStatusBadge from '@/features/admin/components/common/AdminStatusBadge';
+import { AdminViewButton, AdminEditButton, AdminToggleButton, AdminDeleteButton } from '@/features/admin/components/common/AdminTableActions';
 
 export default function CouponPage() {
   const [coupons, setCoupons] = useState<CouponResponse[]>([]);
@@ -73,10 +77,7 @@ export default function CouponPage() {
   };
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      loadCoupons();
-    }, 400);
-    return () => clearTimeout(timer);
+    loadCoupons();
   }, [search, page, statusFilter]);
 
   const openCreateDialog = () => {
@@ -212,17 +213,6 @@ export default function CouponPage() {
     }
   };
 
-  const getStatusBadge = (status: string) => {
-    const baseClass = "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold shadow-sm whitespace-nowrap";
-    switch (status) {
-      case 'ACTIVE': return <span className={`${baseClass} bg-green-600 text-white`}>Hoạt động</span>;
-      case 'INACTIVE': return <span className={`${baseClass} bg-amber-500 text-white`}>Tạm dừng</span>;
-      case 'EXPIRED': return <span className={`${baseClass} bg-slate-500 text-white`}>Hết hạn</span>;
-      case 'DELETED': return <span className={`${baseClass} bg-red-600 text-white`}>Đã xóa</span>;
-      default: return <span className={`${baseClass} bg-slate-500 text-white`}>{status}</span>;
-    }
-  };
-
   const formatCurrency = (amount?: number) => {
     if (amount === undefined || amount === null) return '0 ₫';
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
@@ -234,80 +224,77 @@ export default function CouponPage() {
     return formatCurrency(value);
   };
 
-  const statusFilters = [
-    { label: 'Tất cả', value: 'ALL' },
-    { label: 'Hoạt động', value: 'ACTIVE' },
-    { label: 'Tạm dừng', value: 'INACTIVE' },
-    { label: 'Hết hạn', value: 'EXPIRED' },
-  ];
-
   return (
     <div className="space-y-6">
       {/* Tiêu đề & Nút Thêm */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-bold tracking-tight text-slate-900">Quản lý Mã giảm giá</h2>
-          <p className="text-xs text-slate-500 mt-1">Tạo và quản lý các chương trình ưu đãi, khuyến mãi</p>
-        </div>
-        <Button 
-          className="font-bold bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-1.5 shadow-sm"
-          onClick={openCreateDialog}
-        >
-          <Plus className="w-4 h-4" />
-          Thêm Mã Mới
-        </Button>
-      </div>
-
-      {/* Tabs lọc nhanh trạng thái */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1">
-        {statusFilters.map((tab) => (
-          <button
-            key={tab.value}
-            onClick={() => { setStatusFilter(tab.value); setPage(0); }}
-            className={`px-3 py-1.5 rounded-full text-xs font-bold transition-colors whitespace-nowrap ${
-              statusFilter === tab.value 
-                ? 'bg-blue-600 text-white shadow-sm' 
-                : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
-            }`}
+      <AdminPageHeader
+        title="Quản lý Mã giảm giá"
+        description="Tạo và quản lý các chương trình ưu đãi, khuyến mãi trên toàn hệ thống"
+        badge={totalElements}
+        action={
+          <Button 
+            className="gap-2 shadow-sm font-semibold"
+            onClick={openCreateDialog}
           >
-            {tab.label}
-          </button>
-        ))}
-      </div>
+            <Plus className="w-4 h-4" />
+            Thêm Mã Mới
+          </Button>
+        }
+      />
 
       <Card>
         <CardHeader className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 py-4">
-          <Input 
-            placeholder="Tìm kiếm theo mã code (VD: WELCOME10, SALE20)..." 
-            className="max-w-md border-slate-300 text-slate-900 bg-slate-50 focus:bg-white text-sm" 
-            value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(0); }}
+          <AdminSearchBar
+            placeholder="Tìm kiếm theo mã code (VD: WELCOME10, SALE20)..."
+            defaultValue={search}
+            onSearch={(val) => {
+              setSearch(val);
+              setPage(0);
+            }}
+            className="w-full sm:max-w-md"
           />
+          <Select
+            value={statusFilter}
+            onValueChange={(val) => {
+              setStatusFilter(val);
+              setPage(0);
+            }}
+          >
+            <SelectTrigger className="w-full sm:w-[180px] border-slate-200 rounded-xl text-xs font-semibold h-9">
+              <SelectValue placeholder="Trạng thái" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">Tất cả trạng thái</SelectItem>
+              <SelectItem value="ACTIVE">Hoạt động</SelectItem>
+              <SelectItem value="INACTIVE">Tạm dừng</SelectItem>
+              <SelectItem value="EXPIRED">Hết hạn</SelectItem>
+            </SelectContent>
+          </Select>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead className="font-bold text-slate-900">Mã (Code)</TableHead>
-                <TableHead className="font-bold text-slate-900">Mức giảm</TableHead>
-                <TableHead className="font-bold text-slate-900">Điều kiện</TableHead>
-                <TableHead className="font-bold text-slate-900">Lượt dùng</TableHead>
-                <TableHead className="font-bold text-slate-900">Thời hạn áp dụng</TableHead>
-                <TableHead className="font-bold text-slate-900">Trạng thái</TableHead>
-                <TableHead className="font-bold text-slate-900">Ngày tạo</TableHead>
-                <TableHead className="text-center font-bold text-slate-900">Hành động</TableHead>
+              <TableRow className="bg-slate-50/80 hover:bg-slate-50/80">
+                <TableHead className="font-semibold text-slate-700 text-xs py-3.5">Mã (Code)</TableHead>
+                <TableHead className="font-semibold text-slate-700 text-xs py-3.5">Mức giảm</TableHead>
+                <TableHead className="font-semibold text-slate-700 text-xs py-3.5">Điều kiện</TableHead>
+                <TableHead className="font-semibold text-slate-700 text-xs py-3.5">Lượt dùng</TableHead>
+                <TableHead className="font-semibold text-slate-700 text-xs py-3.5">Thời hạn áp dụng</TableHead>
+                <TableHead className="font-semibold text-slate-700 text-xs py-3.5">Trạng thái</TableHead>
+                <TableHead className="font-semibold text-slate-700 text-xs py-3.5">Ngày tạo</TableHead>
+                <TableHead className="text-center font-semibold text-slate-700 text-xs py-3.5">Hành động</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8 font-bold text-slate-700">Đang tải...</TableCell>
+                  <TableCell colSpan={8} className="text-center py-8 font-semibold text-slate-600">Đang tải...</TableCell>
                 </TableRow>
               ) : coupons.length > 0 ? (
                 coupons.map((coupon) => (
-                  <TableRow key={coupon.id} className="hover:bg-slate-50">
+                  <TableRow key={coupon.id} className="hover:bg-slate-50/80">
                     <TableCell>
-                      <div className="font-mono font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-1 rounded inline-block text-xs">
+                      <div className="font-mono font-bold text-[#0077cc] bg-sky-50 border border-sky-200 px-2.5 py-1 rounded-lg inline-block text-xs">
                         {coupon.code}
                       </div>
                       {coupon.description && (
@@ -317,7 +304,7 @@ export default function CouponPage() {
                       )}
                     </TableCell>
                     <TableCell>
-                      <span className="font-bold text-red-600 text-sm">
+                      <span className="font-bold text-rose-600 text-sm">
                         {formatDiscount(coupon.discountType, coupon.discountValue)}
                       </span>
                       {(coupon.discountType === 'PERCENT' || coupon.discountType === 'PERCENTAGE') && coupon.maxDiscountAmount && coupon.maxDiscountAmount > 0 ? (
@@ -327,12 +314,12 @@ export default function CouponPage() {
                       ) : null}
                     </TableCell>
                     <TableCell>
-                      <div className="text-sm font-medium text-slate-900">
+                      <div className="text-xs font-semibold text-slate-800">
                         Đơn từ {formatCurrency(coupon.minOrderValue || 0)}
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className="text-sm font-bold text-slate-900">
+                      <div className="text-xs font-bold text-slate-900">
                         {coupon.usedCount || 0} / {coupon.usageLimit && coupon.usageLimit > 0 ? coupon.usageLimit : '∞'}
                       </div>
                     </TableCell>
@@ -344,59 +331,30 @@ export default function CouponPage() {
                         Đến: {coupon.endDate ? new Date(coupon.endDate).toLocaleDateString('vi-VN') : '---'}
                       </div>
                     </TableCell>
-                    <TableCell>{getStatusBadge(coupon.status)}</TableCell>
-                    <TableCell className="text-slate-500 text-sm whitespace-nowrap">
+                    <TableCell><AdminStatusBadge status={coupon.status} type="coupon" /></TableCell>
+                    <TableCell className="text-slate-500 text-xs whitespace-nowrap">
                       {coupon.createdAt ? new Date(coupon.createdAt).toLocaleDateString('vi-VN') : '---'}
                     </TableCell>
-                    <TableCell className="text-center space-x-1.5 whitespace-nowrap">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => openDetailDialog(coupon.id)}
-                        className="font-bold border-indigo-200 hover:bg-indigo-50 text-indigo-700 bg-white"
-                      >
-                        <Eye className="w-3.5 h-3.5 mr-1" /> Chi tiết
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => openEditDialog(coupon)}
-                        className="font-bold border-blue-200 hover:bg-blue-50 text-blue-700 bg-white"
-                      >
-                        Sửa
-                      </Button>
+                    <TableCell className="text-center space-x-1.5 whitespace-nowrap py-3">
+                      <AdminViewButton onClick={() => openDetailDialog(coupon.id)} />
+                      <AdminEditButton onClick={() => openEditDialog(coupon)} />
                       {coupon.status !== 'DELETED' && (
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => handleToggleStatus(coupon)}
+                        <AdminToggleButton
+                          active={coupon.status === 'ACTIVE'}
+                          onToggle={() => handleToggleStatus(coupon)}
                           disabled={coupon.status === 'EXPIRED'}
+                          activeLabel="Tạm dừng"
+                          inactiveLabel={coupon.status === 'EXPIRED' ? 'Hết hạn' : 'Kích hoạt'}
                           title={coupon.status === 'EXPIRED' ? 'Mã đã hết hạn, vui lòng sửa hạn sử dụng để kích hoạt lại' : ''}
-                          className={`font-bold ${
-                            coupon.status === 'EXPIRED'
-                              ? 'border-slate-200 text-slate-400 bg-slate-100 cursor-not-allowed'
-                              : coupon.status === 'ACTIVE' 
-                              ? 'border-amber-200 hover:bg-amber-50 text-amber-700 bg-white' 
-                              : 'border-green-200 hover:bg-green-50 text-green-700 bg-white'
-                          }`}
-                        >
-                          {coupon.status === 'ACTIVE' ? 'Tạm dừng' : coupon.status === 'EXPIRED' ? 'Hết hạn' : 'Kích hoạt'}
-                        </Button>
+                        />
                       )}
-                      <Button 
-                        variant="destructive" 
-                        size="sm" 
-                        onClick={() => handleDelete(coupon.id, coupon.code)}
-                        className="font-bold bg-red-600 hover:bg-red-700 text-white"
-                      >
-                        Xóa
-                      </Button>
+                      <AdminDeleteButton onClick={() => handleDelete(coupon.id, coupon.code)} />
                     </TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8 font-bold text-slate-700">
+                  <TableCell colSpan={8} className="text-center py-8 font-semibold text-slate-500">
                     Không tìm thấy mã giảm giá nào
                   </TableCell>
                 </TableRow>
@@ -621,12 +579,12 @@ export default function CouponPage() {
           ) : detailCoupon ? (
             <div className="space-y-4 py-2">
               {/* Header Box mã */}
-              <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200 flex items-center justify-between">
+              <div className="p-4 bg-gradient-to-r from-sky-50 to-blue-50 rounded-xl border border-blue-200 flex items-center justify-between">
                 <div>
                   <span className="text-[11px] font-bold text-blue-600 uppercase tracking-wider block">Mã ưu đãi</span>
                   <span className="text-xl font-extrabold text-blue-900 tracking-wide">{detailCoupon.code}</span>
                 </div>
-                <div>{getStatusBadge(detailCoupon.status)}</div>
+                <div><AdminStatusBadge status={detailCoupon.status} type="coupon" /></div>
               </div>
 
               {/* Thông số ưu đãi */}

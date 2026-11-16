@@ -30,6 +30,9 @@ public class EmbeddingSyncLog {
     @Column(name = "embedding_type")
     private String embeddingType;
     private String status;
+    @Column(name = "needs_resync")
+    @Builder.Default
+    private Boolean needsResync = false;
     @Column(name = "error_message")
     private String errorMessage;
     @Column(name = "synced_at")
