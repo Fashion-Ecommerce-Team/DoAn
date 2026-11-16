@@ -1,8 +1,9 @@
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Security
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 from app.models.chat_schemas import ChatRequest, ChatResponse
-from app.rag.llm import chat_with_rag
+from app.rag.llm import chat_with_function_calling
 from app.rag.product_sync import sync_products
 
 from app.rag.documents.document_sync import (
@@ -12,6 +13,14 @@ from app.rag.documents.document_sync import (
 router = APIRouter(
     prefix="/api/v1/ai",
     tags=["RAG Chatbot"]
+)
+
+# JWT Bearer cho Swagger UI
+# auto_error=False: cho phép chat khi chưa đăng nhập
+bearer_scheme = HTTPBearer(
+    scheme_name="JWT Bearer",
+    description="Nhập JWT của tài khoản đã đăng nhập.",
+    auto_error=False
 )
 
 
@@ -56,20 +65,38 @@ def sync_rag_policies():
 
 
 @router.post("/chat", response_model=ChatResponse)
-def chat(request: ChatRequest):
+def chat(
+    request: ChatRequest,
+    credentials: HTTPAuthorizationCredentials | None = Security(
+        bearer_scheme
+    )
+):
     try:
-        reply = chat_with_rag(request.message.strip())
+        # Lấy JWT từ Swagger hoặc Frontend
+        access_token = None
+
+        if credentials:
+            access_token = credentials.credentials
+
+        # Gemini Function Calling
+        reply = chat_with_function_calling(
+            message=request.message.strip(),
+            access_token=access_token
+        )
 
         return ChatResponse(
             success=True,
-            message="Chatbot RAG trả lời thành công!",
+            message="Chatbot trả lời thành công!",
             reply=reply
         )
 
+    except HTTPException:
+        raise
+
     except Exception as e:
-        print(f"[RAG ERROR] {type(e).__name__}: {e}")
+        print(f"[CHAT ERROR] {type(e).__name__}: {e}")
 
         raise HTTPException(
             status_code=503,
-            detail="Chatbot RAG tạm thời không khả dụng."
+            detail="Chatbot tạm thời không khả dụng."
         )
