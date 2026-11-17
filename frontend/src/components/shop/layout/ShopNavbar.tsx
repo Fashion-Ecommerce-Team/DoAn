@@ -11,7 +11,8 @@ import {
   X, 
   LogOut, 
   MapPin,
-  ShieldCheck
+  ShieldCheck,
+  ShoppingBag
 } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store';
@@ -192,6 +193,16 @@ export default function ShopNavbar({ onOpenSearch, wishlistCount = 0 }: ShopNavb
                     {liveWishlistCount}
                   </span>
                 </Link>
+
+                {/* Cart Link */}
+                <Link
+                  href="/cart"
+                  className="text-neutral-800 hover:text-black transition-colors flex items-center justify-center"
+                  title="Giỏ hàng"
+                  aria-label="Cart"
+                >
+                  <ShoppingBag size={16} className="stroke-[2.2]" />
+                </Link>
               </div>
 
               {/* User Account Dropdown Menu */}
@@ -232,6 +243,13 @@ export default function ShopNavbar({ onOpenSearch, wishlistCount = 0 }: ShopNavb
                         className="flex items-center px-4 py-2.5 text-xs font-medium text-neutral-700 hover:bg-neutral-100 transition-colors"
                       >
                         <User size={14} className="mr-2 text-neutral-500" /> Thông tin cá nhân
+                      </Link>
+
+                      <Link
+                        href="/profile?tab=orders"
+                        className="flex items-center px-4 py-2.5 text-xs font-medium text-neutral-700 hover:bg-neutral-100 transition-colors"
+                      >
+                        <ShoppingBag size={14} className="mr-2 text-neutral-500" /> Lịch sử mua hàng
                       </Link>
 
                       <Link
@@ -359,6 +377,13 @@ export default function ShopNavbar({ onOpenSearch, wishlistCount = 0 }: ShopNavb
                   <span className="bg-black text-white px-2 py-0.5 rounded-full text-[10px]">
                     {liveWishlistCount}
                   </span>
+                </Link>
+
+                <Link
+                  href="/profile?tab=orders"
+                  className="flex items-center gap-2 py-2 text-xs font-bold uppercase tracking-wider text-neutral-800"
+                >
+                  <ShoppingBag size={15} /> Lịch sử mua hàng
                 </Link>
 
                 <Link
