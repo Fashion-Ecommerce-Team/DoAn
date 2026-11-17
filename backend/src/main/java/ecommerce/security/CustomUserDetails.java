@@ -19,10 +19,9 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         String roleName = "ROLE_CUSTOMER";
-        if (user.getRole() != null) {
-            Long roleId = user.getRole().getId();
-            String rawName = user.getRole().getName() != null ? user.getRole().getName().trim().toUpperCase() : "";
-            if ((roleId != null && roleId == 1L) || rawName.contains("ADMIN")) {
+        if (user.getRole() != null && user.getRole().getName() != null) {
+            String rawName = user.getRole().getName().trim().toUpperCase();
+            if (rawName.contains("ADMIN")) {
                 roleName = "ROLE_ADMIN";
             } else if (!rawName.isEmpty()) {
                 roleName = rawName.startsWith("ROLE_") ? rawName : "ROLE_" + rawName;

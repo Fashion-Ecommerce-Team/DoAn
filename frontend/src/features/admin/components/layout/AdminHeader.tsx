@@ -50,19 +50,11 @@ export default function AdminHeader({ onOpenMobileSidebar }: AdminHeaderProps) {
         {/* Admin User Profile Pill */}
         <div className="flex items-center gap-2.5 pl-1.5 py-1 pr-2 rounded-xl hover:bg-slate-100/70 transition-colors cursor-pointer">
           <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#0099FF] to-[#0077cc] text-white flex items-center justify-center font-black text-xs ring-2 ring-sky-100 shadow-xs">
-            AD
-          </div>
-          <div className="hidden sm:flex flex-col text-left">
-            <span className="text-xs font-bold text-slate-800 leading-tight">Quản trị viên</span>
-            <span className="text-[10px] text-[#0099FF] font-bold flex items-center gap-0.5">
-              <ShieldCheck className="w-3 h-3" /> Full Access
-        <div className="flex items-center gap-2.5 pl-1">
-          <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-xs ring-2 ring-slate-100 shadow-sm">
             {initials || 'AD'}
           </div>
           <div className="hidden sm:flex flex-col text-left">
             <span className="text-xs font-bold text-slate-800 leading-tight">{user?.fullName || 'Quản trị viên'}</span>
-            <span className="text-[10px] text-blue-600 font-semibold flex items-center gap-0.5">
+            <span className="text-[10px] text-[#0099FF] font-bold flex items-center gap-0.5">
               <ShieldCheck className="w-3 h-3" /> ROLE_ADMIN
             </span>
           </div>

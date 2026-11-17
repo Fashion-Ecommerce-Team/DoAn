@@ -146,6 +146,12 @@ function LoginForm() {
               <label className="block text-xs font-bold uppercase tracking-wider text-neutral-700">
                 Mật Khẩu *
               </label>
+              <Link
+                href="/forgot-password"
+                className="text-xs font-semibold text-neutral-600 hover:text-black underline underline-offset-4 transition-colors"
+              >
+                Quên mật khẩu?
+              </Link>
             </div>
             <div className="relative">
               <input

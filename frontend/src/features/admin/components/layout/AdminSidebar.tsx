@@ -1,10 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { ShieldCheck, LogOut, X, Sparkles } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
-import { ShieldCheck, LogOut, Store, X } from 'lucide-react';
+import { ShieldCheck, LogOut, Store, X, Sparkles } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store';
 import { logout } from '@/features/auth/authSlice';
@@ -114,22 +112,15 @@ export default function AdminSidebar({ mobileOpen = false, onCloseMobile }: Admi
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5">
-              <p className="text-xs font-bold text-slate-900 truncate">Administrator</p>
+              <p className="text-xs font-bold text-slate-900 truncate">{user?.fullName || 'Administrator'}</p>
               <Sparkles className="w-3 h-3 text-amber-500 flex-shrink-0" />
             </div>
-            <p className="text-[10px] text-slate-400 truncate">admin@system.local</p>
-          </div>
-          <Link
-            href="/"
-            title="Quay lại Shop"
-            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors flex-shrink-0"
-            <p className="text-xs font-bold text-white truncate">{user?.fullName || 'Administrator'}</p>
-            <p className="text-[11px] text-slate-400 truncate">{user?.email || 'admin@system.local'}</p>
+            <p className="text-[10px] text-slate-400 truncate">{user?.email || 'admin@system.local'}</p>
           </div>
           <Link
             href="/"
             title="Về giao diện Cửa hàng"
-            className="p-1.5 text-slate-400 hover:text-blue-400 hover:bg-slate-800 rounded-md transition-colors"
+            className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors flex-shrink-0"
           >
             <Store className="w-4 h-4" />
           </Link>
@@ -137,7 +128,7 @@ export default function AdminSidebar({ mobileOpen = false, onCloseMobile }: Admi
             type="button"
             onClick={handleAdminLogout}
             title="Đăng xuất"
-            className="p-1.5 text-slate-400 hover:text-red-400 hover:bg-slate-800 rounded-md transition-colors"
+            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors flex-shrink-0"
           >
             <LogOut className="w-4 h-4" />
           </button>
