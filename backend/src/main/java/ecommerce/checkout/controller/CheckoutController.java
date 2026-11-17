@@ -6,7 +6,8 @@ import ecommerce.checkout.dto.CheckoutValidateRequest;
 import ecommerce.checkout.service.CheckoutService;
 import ecommerce.common.response.ApiResponse;
 import ecommerce.security.CustomUserDetails;
-
+import ecommerce.checkout.dto.CreateAddressRequest;
+import org.springframework.http.HttpStatus;
 import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
@@ -66,6 +67,25 @@ public ResponseEntity<ApiResponse<List<Map<String, Object>>>> getAddresses(
             ApiResponse.success(
                     "Lấy danh sách địa chỉ thành công",
                     addresses));
+}
+
+@PostMapping("/addresses")
+public ResponseEntity<ApiResponse<Map<String, Object>>> createAddress(
+        @AuthenticationPrincipal CustomUserDetails currentUser,
+        @Valid @RequestBody CreateAddressRequest request) {
+
+    Map<String, Object> address =
+            checkoutService.createAddress(
+                    currentUser.getUserId(),
+                    request
+            );
+
+    return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(ApiResponse.success(
+                    "Thêm địa chỉ giao hàng thành công",
+                    address
+            ));
 }
 
 }

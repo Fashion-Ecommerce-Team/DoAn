@@ -1,7 +1,8 @@
-
 package ecommerce.order.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 
 public class CreateOrderRequest {
@@ -12,6 +13,13 @@ public class CreateOrderRequest {
 
     private String couponCode;
     private String orderNote;
+
+    @NotBlank(message = "Vui lòng chọn phương thức thanh toán")
+    @Pattern(
+        regexp = "COD|VIETQR",
+        message = "Phương thức thanh toán phải là COD hoặc VIETQR"
+    )
+    private String paymentMethod;
 
     public Long getAddressId() {
         return addressId;
@@ -35,5 +43,13 @@ public class CreateOrderRequest {
 
     public void setOrderNote(String orderNote) {
         this.orderNote = orderNote;
+    }
+
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
     }
 }

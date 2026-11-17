@@ -260,12 +260,61 @@ public class CartService {
         return variant;
     }
 
-    private CartItemResponse toResponse(CartItem cartItem) {
-        return new CartItemResponse(
-                cartItem.getId(),
-                cartItem.getProductVariantId(),
-                cartItem.getQuantity(),
-                cartItem.getCreatedAt(),
-                cartItem.getUpdatedAt());
+
+private CartItemResponse toResponse(CartItem cartItem) {
+    CartItemResponse response = new CartItemResponse();
+
+    response.setId(cartItem.getId());
+    response.setProductVariantId(cartItem.getProductVariantId());
+    response.setQuantity(cartItem.getQuantity());
+    response.setCreatedAt(cartItem.getCreatedAt());
+    response.setUpdatedAt(cartItem.getUpdatedAt());
+
+    String sql = """
+        SELECT
+            p.id AS product_id,
+            p.name AS product_name,
+            v.size,
+            v.color,
+            v.stock_quantity,
+            (p.base_price + COALESCE(v.price_adjustment, 0)) AS final_price,
+            (
+                SELECT pi.image_url
+                FROM product_images pi
+                WHERE pi.product_id = p.id
+                ORDER BY pi.is_primary DESC, pi.id ASC
+                LIMIT 1
+            ) AS image_url
+        FROM product_variants v
+        JOIN products p ON p.id = v.product_id
+        WHERE v.id = ?
+        """;
+
+    List<Map<String, Object>> rows = jdbcTemplate.queryForList(
+            sql, cartItem.getProductVariantId());
+
+    if (!rows.isEmpty()) {
+        Map<String, Object> row = rows.get(0);
+
+        response.setProductId(
+                ((Number) row.get("product_id")).longValue());
+        response.setProductName((String) row.get("product_name"));
+        response.setImageUrl((String) row.get("image_url"));
+        response.setSize((String) row.get("size"));
+        response.setColor((String) row.get("color"));
+
+        Object price = row.get("final_price");
+        if (price != null) {
+            response.setPrice(new java.math.BigDecimal(price.toString()));
+        }
+
+        Object stock = row.get("stock_quantity");
+        if (stock != null) {
+            response.setStockQuantity(((Number) stock).intValue());
+        }
     }
+
+    return response;
+}
+
 }
