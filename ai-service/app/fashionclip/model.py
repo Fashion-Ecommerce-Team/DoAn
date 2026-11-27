@@ -71,17 +71,29 @@ class FashionClipModel:
             feat = feat / feat.norm(p=2, dim=-1, keepdim=True)
             return feat.cpu().numpy()[0].astype(np.float32)
 
-    def encode_image(self, image: Image.Image) -> np.ndarray:
+    def encode_image(self, image: Image.Image, use_tta: bool = True) -> np.ndarray:
         """Trích xuất vector đặc trưng 512 chiều từ ảnh PIL, đã chuẩn hóa L2."""
         if image.mode != "RGB":
             image = image.convert("RGB")
 
-        inputs = self.processor(images=image, return_tensors="pt")
+        views = [image]
+        if use_tta and min(image.size) >= 64:
+            w, h = image.size
+            crop_ratio = 0.86
+            dx, dy = int(w * (1.0 - crop_ratio) / 2), int(h * (1.0 - crop_ratio) / 2)
+            if w - 2 * dx >= 32 and h - 2 * dy >= 32:
+                views.append(image.crop((dx, dy, w - dx, h - dy)))
+
+        inputs = self.processor(images=views, return_tensors="pt")
         inputs = {k: v.to(self.device) for k, v in inputs.items()}
         with torch.no_grad():
             out = self.model.get_image_features(**inputs)
             feat = out.pooler_output if hasattr(out, "pooler_output") else out
             feat = feat / feat.norm(p=2, dim=-1, keepdim=True)
+            if feat.shape[0] > 1:
+                combined = 0.65 * feat[0] + 0.35 * feat[1]
+                combined = combined / combined.norm(p=2, dim=-1, keepdim=True)
+                return combined.cpu().numpy().astype(np.float32)
             return feat.cpu().numpy()[0].astype(np.float32)
 
     def load_image_from_bytes(self, data: bytes) -> Image.Image:
@@ -96,8 +108,7 @@ class FashionClipModel:
         target_url = url.strip()
         if target_url.startswith("http://assets.myntassets.com"):
             target_url = target_url.replace("http://assets.myntassets.com", "https://assets.myntassets.com")
-        resp = requests.get(target_url, headers=headers, timeout=30)
-        resp = requests.get(url, headers=headers, timeout=8)
+        resp = requests.get(target_url, headers=headers, timeout=15)
         resp.raise_for_status()
         return Image.open(io.BytesIO(resp.content))
 

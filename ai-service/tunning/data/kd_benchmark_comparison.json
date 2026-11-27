@@ -1,0 +1,242 @@
+{
+  "before_tuning": {
+    "Văn bản (Text Search)": {
+      "overall": {
+        "Recall@1": 60.6,
+        "Recall@5": 91.8,
+        "Recall@10": 97.4,
+        "Recall@20": 99.6,
+        "MRR": 0.7362,
+        "avg_rank": 2.94
+      },
+      "by_category": {
+        "Apparel": {
+          "Recall@1": 58.91,
+          "Recall@5": 90.91,
+          "Recall@10": 97.09,
+          "Recall@20": 99.64,
+          "MRR": 0.7195,
+          "avg_rank": 2.61
+        },
+        "Footwear": {
+          "Recall@1": 61.6,
+          "Recall@5": 92.0,
+          "Recall@10": 97.6,
+          "Recall@20": 100.0,
+          "MRR": 0.7508,
+          "avg_rank": 2.22
+        },
+        "Accessories": {
+          "Recall@1": 64.0,
+          "Recall@5": 94.0,
+          "Recall@10": 98.0,
+          "Recall@20": 99.0,
+          "MRR": 0.7642,
+          "avg_rank": 4.78
+        }
+      }
+    },
+    "Hình ảnh (Image Search)": {
+      "overall": {
+        "Recall@1": 41.4,
+        "Recall@5": 68.0,
+        "Recall@10": 78.6,
+        "Recall@20": 86.2,
+        "MRR": 0.5388,
+        "avg_rank": 10.58
+      },
+      "by_category": {
+        "Apparel": {
+          "Recall@1": 37.82,
+          "Recall@5": 62.55,
+          "Recall@10": 73.82,
+          "Recall@20": 82.91,
+          "MRR": 0.5012,
+          "avg_rank": 11.56
+        },
+        "Footwear": {
+          "Recall@1": 45.6,
+          "Recall@5": 74.4,
+          "Recall@10": 83.2,
+          "Recall@20": 89.6,
+          "MRR": 0.5824,
+          "avg_rank": 8.2
+        },
+        "Accessories": {
+          "Recall@1": 46.0,
+          "Recall@5": 75.0,
+          "Recall@10": 86.0,
+          "Recall@20": 91.0,
+          "MRR": 0.588,
+          "avg_rank": 10.87
+        }
+      }
+    },
+    "Kết hợp (Hybrid: Ảnh + Chữ)": {
+      "overall": {
+        "Recall@1": 84.8,
+        "Recall@5": 98.4,
+        "Recall@10": 99.6,
+        "Recall@20": 100.0,
+        "MRR": 0.9073,
+        "avg_rank": 1.34
+      },
+      "by_category": {
+        "Apparel": {
+          "Recall@1": 82.18,
+          "Recall@5": 97.82,
+          "Recall@10": 99.27,
+          "Recall@20": 100.0,
+          "MRR": 0.8891,
+          "avg_rank": 1.45
+        },
+        "Footwear": {
+          "Recall@1": 91.2,
+          "Recall@5": 100.0,
+          "Recall@10": 100.0,
+          "Recall@20": 100.0,
+          "MRR": 0.9516,
+          "avg_rank": 1.13
+        },
+        "Accessories": {
+          "Recall@1": 84.0,
+          "Recall@5": 98.0,
+          "Recall@10": 100.0,
+          "Recall@20": 100.0,
+          "MRR": 0.9021,
+          "avg_rank": 1.33
+        }
+      }
+    }
+  },
+  "after_kd_tuning": {
+    "Văn bản (Text Search)": {
+      "overall": {
+        "Recall@1": 79.2,
+        "Recall@5": 97.4,
+        "Recall@10": 99.2,
+        "Recall@20": 99.6,
+        "MRR": 0.8689,
+        "avg_rank": 1.67
+      },
+      "by_category": {
+        "Apparel": {
+          "Recall@1": 76.0,
+          "Recall@5": 96.36,
+          "Recall@10": 98.91,
+          "Recall@20": 99.64,
+          "MRR": 0.8454,
+          "avg_rank": 1.77
+        },
+        "Footwear": {
+          "Recall@1": 86.4,
+          "Recall@5": 99.2,
+          "Recall@10": 100.0,
+          "Recall@20": 100.0,
+          "MRR": 0.9177,
+          "avg_rank": 1.29
+        },
+        "Accessories": {
+          "Recall@1": 79.0,
+          "Recall@5": 98.0,
+          "Recall@10": 99.0,
+          "Recall@20": 99.0,
+          "MRR": 0.8726,
+          "avg_rank": 1.89
+        }
+      }
+    },
+    "Hình ảnh (Image Search)": {
+      "overall": {
+        "Recall@1": 84.4,
+        "Recall@5": 96.4,
+        "Recall@10": 99.2,
+        "Recall@20": 99.8,
+        "MRR": 0.8961,
+        "avg_rank": 1.54
+      },
+      "by_category": {
+        "Apparel": {
+          "Recall@1": 82.18,
+          "Recall@5": 95.64,
+          "Recall@10": 98.55,
+          "Recall@20": 99.64,
+          "MRR": 0.8827,
+          "avg_rank": 1.68
+        },
+        "Footwear": {
+          "Recall@1": 88.0,
+          "Recall@5": 97.6,
+          "Recall@10": 100.0,
+          "Recall@20": 100.0,
+          "MRR": 0.922,
+          "avg_rank": 1.31
+        },
+        "Accessories": {
+          "Recall@1": 86.0,
+          "Recall@5": 97.0,
+          "Recall@10": 100.0,
+          "Recall@20": 100.0,
+          "MRR": 0.9005,
+          "avg_rank": 1.46
+        }
+      }
+    },
+    "Kết hợp (Hybrid: Ảnh + Chữ)": {
+      "overall": {
+        "Recall@1": 96.4,
+        "Recall@5": 100.0,
+        "Recall@10": 100.0,
+        "Recall@20": 100.0,
+        "MRR": 0.9811,
+        "avg_rank": 1.04
+      },
+      "by_category": {
+        "Apparel": {
+          "Recall@1": 95.27,
+          "Recall@5": 100.0,
+          "Recall@10": 100.0,
+          "Recall@20": 100.0,
+          "MRR": 0.9747,
+          "avg_rank": 1.06
+        },
+        "Footwear": {
+          "Recall@1": 97.6,
+          "Recall@5": 100.0,
+          "Recall@10": 100.0,
+          "Recall@20": 100.0,
+          "MRR": 0.988,
+          "avg_rank": 1.02
+        },
+        "Accessories": {
+          "Recall@1": 98.0,
+          "Recall@5": 100.0,
+          "Recall@10": 100.0,
+          "Recall@20": 100.0,
+          "MRR": 0.99,
+          "avg_rank": 1.02
+        }
+      }
+    }
+  },
+  "improvements": {
+    "Văn bản (Text Search)": {
+      "Recall@1_gain": 18.6,
+      "Recall@5_gain": 5.6,
+      "Recall@10_gain": 1.8,
+      "MRR_gain": 0.1327
+    },
+    "Hình ảnh (Image Search)": {
+      "Recall@1_gain": 43.0,
+      "Recall@5_gain": 28.4,
+      "Recall@10_gain": 20.6,
+      "MRR_gain": 0.3573
+    },
+    "Kết hợp (Hybrid: Ảnh + Chữ)": {
+      "Recall@1_gain": 11.6,
+      "Recall@5_gain": 1.6,
+      "Recall@10_gain": 0.4,
+      "MRR_gain": 0.0738
+    }
+  }
+}

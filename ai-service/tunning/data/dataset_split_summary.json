@@ -1,0 +1,30 @@
+{
+  "total_samples": 10000,
+  "splits": {
+    "train": {
+      "total": 8500,
+      "by_category": {
+        "Apparel": 4675,
+        "Footwear": 2125,
+        "Accessories": 1700
+      }
+    },
+    "validation": {
+      "total": 1000,
+      "by_category": {
+        "Apparel": 550,
+        "Footwear": 250,
+        "Accessories": 200
+      }
+    },
+    "test": {
+      "total": 500,
+      "by_category": {
+        "Apparel": 275,
+        "Footwear": 125,
+        "Accessories": 100
+      }
+    }
+  },
+  "zero_data_leakage_verified": true
+}
